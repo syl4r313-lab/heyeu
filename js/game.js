@@ -28,11 +28,13 @@ const $ = id => document.getElementById(id);
 
 function saveGame() {
   if (!state.char) return;
-  localStorage.setItem(SAVE_KEY, JSON.stringify({
-    char: state.char, stars: state.stars, tasks: state.tasks,
-    visited: state.visited,
-    pos: state.player ? { x: state.player.tx, y: state.player.ty } : null
-  }));
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      char: state.char, stars: state.stars, tasks: state.tasks,
+      visited: state.visited,
+      pos: state.player ? { x: state.player.tx, y: state.player.ty } : null
+    }));
+  } catch (e) { /* Speicher nicht verfügbar (z. B. eingebettete Seite) – Spiel läuft trotzdem */ }
 }
 
 function loadSave() {
