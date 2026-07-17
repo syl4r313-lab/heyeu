@@ -4,13 +4,14 @@
    wie ein kleiner Schulhof (~70 m² Spielgefühl).
    ============================================================ */
 
-const TILE = 16;          // Pixelgröße einer Kachel in der Vorlage
-const WORLD_W = 112;      // Kacheln breit
-const WORLD_H = 80;       // Kacheln hoch
+const TILE = 16;              // Pixelgröße einer Kachel in der Vorlage
+const MAP_SCALE = 2;          // Länderformen werden 2x vergrößert
+const WORLD_W = 112 * MAP_SCALE;
+const WORLD_H = 80 * MAP_SCALE;
 
 /* Kachel-Typen */
 const T_SEA = 0, T_GRASS = 1, T_BRIDGE = 2, T_TREE = 3, T_MOUNTAIN = 4,
-      T_FLOWER = 5, T_LANDMARK = 6;
+      T_FLOWER = 5, T_LANDMARK = 6, T_BOARD = 7;
 
 /* Länder: shape = '#' ist Land, '.' ist Meer.
    lm = Wahrzeichen (dx/dy relativ zur Form, muss auf '#' liegen). */
@@ -330,6 +331,47 @@ const FAREWELLS = [
   'Bis bald! Gute Reise durch Europa! 🧭',
   'Ciao! War schön, mit dir zu schreiben! 😊'
 ];
+
+/* ---------- Pinnwände ----------
+   In jedem Land steht eine Pinnwand. Moderator:innen stellen dort
+   besondere Aufgaben ein. Eingereichte Beiträge müssen von
+   Administrator:innen geprüft und freigeschaltet werden.
+   country: null = hängt an allen Pinnwänden */
+const BOARD_TASKS = [
+  { id: 'foto-klasse', country: null, emoji: '📸',
+    title: 'Foto aus deinem Klassenraum',
+    desc: 'Mach ein Foto aus deinem Klassenraum und lade es hier hoch. Zeig den anderen, wie ihr lernt!' },
+  { id: 'wahrzeichen-malen', country: null, emoji: '🎨',
+    title: 'Male ein Wahrzeichen',
+    desc: 'Male dein Lieblings-Wahrzeichen aus Europa, fotografiere dein Bild und lade es hoch!' },
+  { id: 'drei-saetze', country: null, emoji: '📝',
+    title: 'Drei Sätze über dein Land',
+    desc: 'Schreibe drei Sätze über dein Heimatland – gern auch in einer anderen Sprache!' },
+  { id: 'gericht', country: null, emoji: '🍽️',
+    title: 'Dein Lieblingsgericht',
+    desc: 'Fotografiere oder beschreibe ein typisches Gericht aus deinem Land.' },
+  { id: 'de-nachbarn', country: 'de', emoji: '🧭',
+    title: 'Deutschlands Nachbarn',
+    desc: 'Deutschland hat 9 Nachbarländer. Finde sie heraus und schreibe sie auf!' },
+  { id: 'fr-flagge', country: 'fr', emoji: '🇫🇷',
+    title: 'Die Trikolore',
+    desc: 'Welche drei Farben hat die französische Flagge? Schreibe sie in der richtigen Reihenfolge auf.' },
+  { id: 'it-pizza', country: 'it', emoji: '🍕',
+    title: 'Erfinde eine Pizza',
+    desc: 'Erfinde deine eigene Pizza! Gib ihr einen Namen und beschreibe die Zutaten.' },
+  { id: 'es-tanz', country: 'es', emoji: '💃',
+    title: 'Tanz & Musik',
+    desc: 'Finde einen spanischen Tanz oder ein spanisches Lied und beschreibe es in zwei Sätzen.' },
+  { id: 'pl-sage', country: 'pl', emoji: '🐉',
+    title: 'Die Drachensage',
+    desc: 'Erzähle die Sage vom Wawel-Drachen in deinen eigenen Worten – oder male den Drachen!' },
+  { id: 'se-natur', country: 'se', emoji: '🌲',
+    title: 'Tiere des Nordens',
+    desc: 'Welche Tiere leben in Schwedens Wäldern? Nenne mindestens drei.' }
+];
+
+/* Demo-PIN für den Admin-Bereich (nur für diese Server-lose Version!) */
+const ADMIN_PIN = '2468';
 
 /* Charakter-Editor-Paletten */
 const SKIN_TONES = ['#ffe0c2', '#f5c99b', '#e0a878', '#c68a5a', '#9c6a42', '#7a4f30'];

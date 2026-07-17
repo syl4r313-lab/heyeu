@@ -11,6 +11,7 @@ const state = {
   stars: 0,
   tasks: [],             // { id, type:'visit', country, done }
   visited: [],           // Länder-IDs besuchter Wahrzeichen
+  submissions: [],       // Pinnwand-Beiträge { id, taskId, country, text, photo, status }
   player: null,
   npcs: [],
   camera: { x: 0, y: 0 },
@@ -28,13 +29,20 @@ const $ = id => document.getElementById(id);
 
 function saveGame() {
   if (!state.char) return;
+  const data = {
+    char: state.char, stars: state.stars, tasks: state.tasks,
+    visited: state.visited, submissions: state.submissions,
+    pos: state.player ? { x: state.player.tx, y: state.player.ty } : null
+  };
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({
-      char: state.char, stars: state.stars, tasks: state.tasks,
-      visited: state.visited,
-      pos: state.player ? { x: state.player.tx, y: state.player.ty } : null
-    }));
-  } catch (e) { /* Speicher nicht verfügbar (z. B. eingebettete Seite) – Spiel läuft trotzdem */ }
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  } catch (e) {
+    // Speicher voll oder gesperrt: Fotos weglassen und erneut versuchen
+    try {
+      data.submissions = state.submissions.map(s => ({ ...s, photo: null }));
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    } catch (e2) { /* Spiel läuft ohne Speichern weiter */ }
+  }
 }
 
 function loadSave() {
@@ -204,12 +212,211 @@ function interact() {
   if (npc) { openChat(npc); return; }
   let lm = World.landmarks.find(l => l.x === f.x && l.y === f.y);
   if (lm) { visitLandmark(lm); return; }
+  let bd = World.boards.find(b => b.x === f.x && b.y === f.y);
+  if (bd) { openBoard(bd.ci); return; }
 
   // sonst: irgendetwas direkt daneben
   npc = state.npcs.find(n => adjacent(n.tx, n.ty));
   if (npc) { openChat(npc); return; }
   lm = World.landmarks.find(l => adjacent(l.x, l.y));
-  if (lm) visitLandmark(lm);
+  if (lm) { visitLandmark(lm); return; }
+  bd = World.boards.find(b => adjacent(b.x, b.y));
+  if (bd) openBoard(bd.ci);
+}
+
+/* ---------------- Pinnwand & Einreichungen ---------------- */
+
+let currentBoardCountry = null;
+let currentBoardTask = null;
+let pendingPhoto = null;
+
+function boardTasksFor(countryId) {
+  return BOARD_TASKS.filter(t => t.country === null || t.country === countryId);
+}
+
+function submissionFor(taskId, countryId) {
+  return state.submissions.find(s => s.taskId === taskId && s.country === countryId &&
+    s.status !== 'rejected');
+}
+
+function openBoard(ci) {
+  const c = COUNTRIES[ci];
+  currentBoardCountry = c.id;
+  $('board-title').textContent = `📌 Pinnwand ${c.flag} ${c.name}`;
+  const list = $('board-list');
+  list.innerHTML = '';
+
+  boardTasksFor(c.id).forEach(task => {
+    const sub = submissionFor(task.id, c.id);
+    const div = document.createElement('div');
+    div.className = 'board-task';
+    let status = '';
+    if (sub && sub.status === 'pending') status = '<span class="badge pending">⏳ Wartet auf Freigabe</span>';
+    else if (sub && sub.status === 'approved') status = '<span class="badge approved">✅ Freigegeben +5 ⭐</span>';
+    div.innerHTML = `<div class="board-task-head"><span class="board-emoji">${task.emoji}</span>
+      <b>${task.title}</b></div>
+      <p>${task.desc}</p><div class="board-task-foot">${status}</div>`;
+    if (!sub) {
+      const btn = document.createElement('button');
+      btn.className = 'pill submit-pill';
+      btn.textContent = '✍️ Beitrag einreichen';
+      btn.addEventListener('click', () => openSubmitForm(task));
+      div.querySelector('.board-task-foot').appendChild(btn);
+    }
+    list.appendChild(div);
+  });
+
+  // Galerie freigegebener Beiträge dieses Landes
+  const approved = state.submissions.filter(s => s.country === c.id && s.status === 'approved');
+  const gal = $('board-gallery');
+  gal.innerHTML = '';
+  if (approved.length) {
+    const h = document.createElement('h3');
+    h.textContent = '🌟 Freigegebene Beiträge';
+    gal.appendChild(h);
+    approved.forEach(s => {
+      const task = BOARD_TASKS.find(t => t.id === s.taskId);
+      const div = document.createElement('div');
+      div.className = 'gallery-item';
+      div.innerHTML = `<b>${task ? task.emoji + ' ' + task.title : ''}</b>` +
+        (s.photo ? `<img src="${s.photo}" alt="Beitrag">` : '') +
+        (s.text ? `<p>${escapeHtml(s.text)}</p>` : '') +
+        `<small>von ${escapeHtml(s.player)}</small>`;
+      gal.appendChild(div);
+    });
+  }
+  $('board-panel').classList.remove('hidden');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function openSubmitForm(task) {
+  currentBoardTask = task;
+  pendingPhoto = null;
+  $('board-panel').classList.add('hidden');
+  $('submit-title').textContent = `${task.emoji} ${task.title}`;
+  $('submit-desc').textContent = task.desc;
+  $('submit-text').value = '';
+  $('submit-photo-preview').classList.add('hidden');
+  $('submit-photo-input').value = '';
+  $('submit-error').textContent = '';
+  $('submit-panel').classList.remove('hidden');
+}
+
+function handlePhotoInput(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      // verkleinern, damit der Browser-Speicher reicht
+      const max = 480;
+      const f = Math.min(1, max / Math.max(img.width, img.height));
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * f);
+      cv.height = Math.round(img.height * f);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      pendingPhoto = cv.toDataURL('image/jpeg', 0.75);
+      const prev = $('submit-photo-preview');
+      prev.src = pendingPhoto;
+      prev.classList.remove('hidden');
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+let submissionCounter = 0;
+
+function submitBoardEntry() {
+  const text = $('submit-text').value.trim();
+  if (!text && !pendingPhoto) {
+    $('submit-error').textContent = 'Schreib einen Text oder lade ein Foto hoch. 😊';
+    return;
+  }
+  if (text && !isTextClean(text)) {
+    $('submit-error').textContent = 'Dein Text enthält Wörter, die hier nicht erlaubt sind. Bitte formuliere ihn freundlich um. 😊';
+    return;
+  }
+  state.submissions.push({
+    id: ++submissionCounter,
+    taskId: currentBoardTask.id,
+    country: currentBoardCountry,
+    player: state.char.name,
+    text, photo: pendingPhoto,
+    status: 'pending',
+    date: new Date().toLocaleDateString('de-DE')
+  });
+  saveGame();
+  $('submit-panel').classList.add('hidden');
+  toast('📬 Dein Beitrag wurde eingereicht! Ein Admin schaut ihn sich bald an.');
+}
+
+/* ---------------- Admin-Bereich ---------------- */
+
+function openAdminPin() {
+  $('admin-pin-input').value = '';
+  $('admin-pin-error').textContent = '';
+  $('help-panel').classList.add('hidden');
+  $('admin-pin-panel').classList.remove('hidden');
+}
+
+function checkAdminPin() {
+  if ($('admin-pin-input').value === ADMIN_PIN) {
+    $('admin-pin-panel').classList.add('hidden');
+    openAdminPanel();
+  } else {
+    $('admin-pin-error').textContent = 'Falsche PIN.';
+  }
+}
+
+function openAdminPanel() {
+  const list = $('admin-list');
+  list.innerHTML = '';
+  const pending = state.submissions.filter(s => s.status === 'pending');
+  $('admin-count').textContent = pending.length
+    ? `${pending.length} Beitrag/Beiträge warten auf Prüfung:`
+    : 'Keine offenen Beiträge. Alles erledigt! 🎉';
+
+  pending.forEach(s => {
+    const task = BOARD_TASKS.find(t => t.id === s.taskId);
+    const c = COUNTRIES.find(x => x.id === s.country);
+    const div = document.createElement('div');
+    div.className = 'admin-item';
+    div.innerHTML =
+      `<b>${task ? task.emoji + ' ' + task.title : s.taskId}</b>
+       <small>${c ? c.flag + ' ' + c.name : ''} · von ${escapeHtml(s.player)} · ${s.date}</small>` +
+      (s.photo ? `<img src="${s.photo}" alt="Beitrag">` : '') +
+      (s.text ? `<p>${escapeHtml(s.text)}</p>` : '');
+    const row = document.createElement('div');
+    row.className = 'admin-actions';
+    const ok = document.createElement('button');
+    ok.className = 'big-btn small approve';
+    ok.textContent = '✅ Freigeben';
+    ok.addEventListener('click', () => {
+      s.status = 'approved';
+      state.stars += 5;
+      updateHud(); saveGame();
+      toast('✅ Beitrag freigegeben! +5 ⭐');
+      openAdminPanel();
+    });
+    const no = document.createElement('button');
+    no.className = 'big-btn small reject';
+    no.textContent = '❌ Ablehnen';
+    no.addEventListener('click', () => {
+      s.status = 'rejected';
+      saveGame();
+      openAdminPanel();
+    });
+    row.appendChild(ok); row.appendChild(no);
+    div.appendChild(row);
+    list.appendChild(div);
+  });
+  $('admin-panel').classList.remove('hidden');
 }
 
 function visitLandmark(lm) {
@@ -252,7 +459,7 @@ function openChat(npc) {
   addBubble('me', 'hey EU! 👋');
 
   if (npc.role === 'mod') {
-    npcSay(`hey EU, hallo ${state.char.name}! 😊 Ich bin ${npc.name}. Ich habe eine neue Aufgabe für dich. Willst du sie hören?`);
+    npcSay(`hey EU, hallo ${state.char.name}! 😊 Ich bin ${npc.name}. Ich habe eine neue Aufgabe für dich. Willst du sie hören? Übrigens: An der Pinnwand 📌 findest du besondere Mitmach-Aufgaben!`);
     setQuickReplies([
       { label: 'Ja, klar! ✨', fn: () => offerTask(npc) },
       { label: 'Später! 👋', fn: closeChat }
@@ -497,9 +704,9 @@ function resizeCanvas() {
   canvas.height = holder.clientHeight * dpr;
   canvas.style.width = holder.clientWidth + 'px';
   canvas.style.height = holder.clientHeight + 'px';
-  // Zoom: ca. 11–14 Kacheln in der kleineren Richtung
+  // Zoom: ca. 13–15 Kacheln in der kleineren Richtung
   const minDim = Math.min(canvas.width, canvas.height);
-  state.scale = Math.max(2, Math.round(minDim / (TILE * 12)));
+  state.scale = Math.max(2, Math.round(minDim / (TILE * 13)));
   ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
 }
@@ -536,11 +743,11 @@ function drawActor(a, camX, camY, s) {
   // Schatten
   ctx.fillStyle = 'rgba(0,0,0,0.22)';
   ctx.beginPath();
-  ctx.ellipse(x, y - 2 * state.scale * 0.4, 5 * state.scale * 0.8, 2 * state.scale * 0.6, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, y - state.scale, 6 * state.scale * 0.8, 2.2 * state.scale * 0.6, 0, 0, Math.PI * 2);
   ctx.fill();
 
   const frame = a.frames[a.dir + a.animFrame];
-  const w = 12 * state.scale, h = 13 * state.scale;
+  const w = SPRITE_W * state.scale, h = SPRITE_H * state.scale;
   ctx.drawImage(frame, Math.round(x - w / 2), Math.round(y - h), w, h);
 
   if (a !== state.player) {
@@ -624,5 +831,5 @@ function startGame(charCfg, savedPos) {
     state.running = true;
     requestAnimationFrame(t => { state.lastTime = t; loop(t); });
   }
-  toast('Willkommen bei hey EU! Lauf über die Holzstege in andere Länder. 🌍');
+  toast('Willkommen bei hey EU! Lauf über die Holzstege in andere Länder – und schau an die Pinnwände! 📌🌍');
 }

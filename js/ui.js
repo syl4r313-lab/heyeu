@@ -18,8 +18,9 @@ function renderPreview() {
   c.clearRect(0, 0, cv.width, cv.height);
   const frames = makeCharacterSprites(creator);
   const f = frames.down0;
-  const scale = 10;
-  c.drawImage(f, (cv.width - 12 * scale) / 2, (cv.height - 13 * scale) / 2, 12 * scale, 13 * scale);
+  const scale = 7;
+  c.drawImage(f, (cv.width - SPRITE_W * scale) / 2, (cv.height - SPRITE_H * scale) / 2,
+    SPRITE_W * scale, SPRITE_H * scale);
 }
 
 function buildSwatches(containerId, colors, key) {
@@ -91,7 +92,9 @@ function initUi() {
       state.stars = save.stars || 0;
       state.tasks = save.tasks || [];
       state.visited = save.visited || [];
+      state.submissions = save.submissions || [];
       taskCounter = state.tasks.reduce((m, t) => Math.max(m, t.id), 0);
+      submissionCounter = state.submissions.reduce((m, s) => Math.max(m, s.id), 0);
       startGame(save.char, save.pos);
     });
   }
@@ -103,10 +106,17 @@ function initUi() {
 
   $('btn-create-done').addEventListener('click', () => {
     const name = $('creator-name').value.trim();
-    if (!name) { $('creator-name').focus(); $('creator-name').classList.add('shake');
-      setTimeout(() => $('creator-name').classList.remove('shake'), 500); return; }
+    const problem = checkName(name);
+    if (problem) {
+      $('creator-name-error').textContent = problem;
+      $('creator-name').focus();
+      $('creator-name').classList.add('shake');
+      setTimeout(() => $('creator-name').classList.remove('shake'), 500);
+      return;
+    }
+    $('creator-name-error').textContent = '';
     creator.name = name.slice(0, 14);
-    state.stars = 0; state.tasks = []; state.visited = [];
+    state.stars = 0; state.tasks = []; state.visited = []; state.submissions = [];
     startGame({ ...creator }, null);
   });
 
@@ -117,6 +127,21 @@ function initUi() {
   document.querySelectorAll('.panel-close').forEach(b =>
     b.addEventListener('click', () => b.closest('.panel').classList.add('hidden')));
   $('info-close').addEventListener('click', () => $('info-card').classList.add('hidden'));
+
+  // Pinnwand & Einreichung
+  $('submit-photo-input').addEventListener('change', e => handlePhotoInput(e.target.files[0]));
+  $('submit-send').addEventListener('click', submitBoardEntry);
+  $('submit-cancel').addEventListener('click', () => {
+    $('submit-panel').classList.add('hidden');
+  });
+
+  // Admin-Bereich
+  $('btn-admin').addEventListener('click', openAdminPin);
+  $('admin-pin-ok').addEventListener('click', checkAdminPin);
+  $('admin-pin-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAdminPin();
+    e.stopPropagation();
+  });
 
   // Chat
   $('chat-close').addEventListener('click', closeChat);
@@ -146,6 +171,15 @@ function sendChatInput() {
   const input = $('chat-input');
   const text = input.value.trim();
   if (!text || !state.chat) return;
+  if (!isTextClean(text)) {
+    input.value = '';
+    const div = document.createElement('div');
+    div.className = 'bubble system';
+    div.textContent = '🛡️ Ups! Diese Nachricht enthält Wörter, die hier nicht erlaubt sind. Bleib bitte freundlich. 😊';
+    $('chat-messages').appendChild(div);
+    $('chat-messages').scrollTop = $('chat-messages').scrollHeight;
+    return;
+  }
   input.value = '';
   addBubble('me', text);
   if (state.chat.npc.role === 'mod') {

@@ -38,6 +38,7 @@
         <div class="creator-right">
           <label>Dein Name</label>
           <input id="creator-name" type="text" maxlength="14" placeholder="Wie heißt du?">
+          <p id="creator-name-error" class="field-error"></p>
 
           <label>Dein Heimatland</label>
           <select id="creator-country"></select>
@@ -127,15 +128,58 @@
         <li>🚶 <b>Laufen:</b> Pfeiltasten / WASD oder Steuerkreuz</li>
         <li>💬 <b>Chatten:</b> Stell dich neben ein Kind und drücke <b>A</b> (oder Leertaste). Jeder Chat beginnt mit „hey EU“!</li>
         <li>⭐ <b>Aufgaben:</b> Moderator:innen tragen goldene Shirts – sie geben dir Quizfragen und Reise-Aufgaben.</li>
+        <li>📌 <b>Pinnwände:</b> In jedem Land steht eine Pinnwand mit besonderen Mitmach-Aufgaben. Deine Beiträge werden von Admins geprüft und freigeschaltet.</li>
         <li>🗼 <b>Wahrzeichen:</b> Stell dich davor und drücke <b>A</b>, um etwas zu lernen.</li>
         <li>🌉 <b>Reisen:</b> Über die Holzstege läufst du von Land zu Land.</li>
       </ul>
+      <button id="btn-admin" class="pill">🛡️ Admin-Bereich</button>
+    </div>
+
+    <!-- Pinnwand -->
+    <div id="board-panel" class="panel wide hidden">
+      <div class="panel-head"><h2 id="board-title">📌 Pinnwand</h2><button class="panel-close">✕</button></div>
+      <div id="board-list"></div>
+      <div id="board-gallery"></div>
+    </div>
+
+    <!-- Beitrag einreichen -->
+    <div id="submit-panel" class="panel hidden">
+      <div class="panel-head"><h2 id="submit-title"></h2><button class="panel-close">✕</button></div>
+      <p id="submit-desc" class="muted"></p>
+      <textarea id="submit-text" rows="4" maxlength="500" placeholder="Schreibe hier deinen Beitrag…"></textarea>
+      <label class="file-btn">
+        📷 Foto auswählen
+        <input id="submit-photo-input" type="file" accept="image/*">
+      </label>
+      <img id="submit-photo-preview" class="hidden" alt="Foto-Vorschau">
+      <p id="submit-error" class="field-error"></p>
+      <div class="submit-row">
+        <button id="submit-cancel" class="pill">Abbrechen</button>
+        <button id="submit-send" class="big-btn small">📬 Einreichen</button>
+      </div>
+    </div>
+
+    <!-- Admin: PIN -->
+    <div id="admin-pin-panel" class="panel hidden">
+      <div class="panel-head"><h2>🛡️ Admin-Bereich</h2><button class="panel-close">✕</button></div>
+      <p class="muted">Nur für Administrator:innen. Bitte PIN eingeben:</p>
+      <input id="admin-pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="PIN">
+      <p id="admin-pin-error" class="field-error"></p>
+      <button id="admin-pin-ok" class="big-btn small">Öffnen</button>
+    </div>
+
+    <!-- Admin: Beiträge prüfen -->
+    <div id="admin-panel" class="panel wide hidden">
+      <div class="panel-head"><h2>🛡️ Beiträge prüfen</h2><button class="panel-close">✕</button></div>
+      <p id="admin-count" class="muted"></p>
+      <div id="admin-list"></div>
     </div>
 
     <div id="toast" class="hidden"></div>
   </div>
 
   <script src="js/data.js"></script>
+  <script src="js/filter.js"></script>
   <script src="js/sprites.js"></script>
   <script src="js/world.js"></script>
   <script src="js/game.js"></script>
