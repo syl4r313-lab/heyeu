@@ -1,0 +1,13 @@
+# hey EU – Test-Phase: alles läuft über die Login-Seite
+Options -Indexes
+
+RewriteEngine On
+
+# HTTPS erzwingen
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# /spiel und die App-Dateien nur über den Wächter (Session-Prüfung)
+RewriteRule ^spiel/?$ serve.php [L,QSA]
+RewriteRule ^(css/[a-z0-9_-]+\.css)$ serve.php?f=$1 [L]
+RewriteRule ^(js/[a-z0-9_-]+\.js)$ serve.php?f=$1 [L]
