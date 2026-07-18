@@ -1,0 +1,4 @@
+Bitte hier die beiden Logo-Dateien hochladen:
+  logo-links.png   (Europa-Schecks)
+  logo-rechts.png  (Gesamtschule Nordstadt Neuss)
+PNG oder JPG ist egal, der Dateiname muss aber exakt stimmen (.png).

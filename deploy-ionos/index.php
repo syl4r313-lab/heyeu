@@ -141,6 +141,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       padding: .55rem .8rem;
     }
     .hint { margin-top: 1.1rem; font-size: .8rem; color: #7a93ad; }
+
+    /* Partner-Logos unten links und rechts */
+    .logo-ecke {
+      position: fixed;
+      bottom: 1rem;
+      background: rgba(255,255,255,.95);
+      border-radius: 16px;
+      padding: .5rem .8rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,.18);
+      z-index: 5;
+    }
+    .logo-ecke img { display: block; height: 52px; width: auto; max-width: 40vw; object-fit: contain; }
+    .logo-ecke.links { left: 1rem; }
+    .logo-ecke.rechts { right: 1rem; }
+    @media (max-width: 620px), (max-height: 620px) {
+      .logo-ecke { bottom: .5rem; padding: .35rem .55rem; border-radius: 12px; }
+      .logo-ecke img { height: 36px; }
+      .logo-ecke.links { left: .5rem; }
+      .logo-ecke.rechts { right: .5rem; }
+    }
   </style>
 </head>
 <body>
@@ -173,6 +193,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <p class="hint">Keine Zugangsdaten? Frag die Person, die dich zum Testen eingeladen hat. 😊</p>
+  </div>
+
+  <div class="logo-ecke links">
+    <img src="logos/logo-links.png" alt="Europa-Schecks – Eine Initiative des Landes Nordrhein-Westfalen"
+         onerror="this.parentElement.style.display='none'">
+  </div>
+  <div class="logo-ecke rechts">
+    <img src="logos/logo-rechts.png" alt="Gesamtschule Nordstadt Neuss"
+         onerror="this.parentElement.style.display='none'">
   </div>
 </body>
 </html>
