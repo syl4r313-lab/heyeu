@@ -192,4 +192,6 @@ function sendChatInput() {
 window.addEventListener('DOMContentLoaded', () => {
   initUi();
   setupInput();
+  Music.init();
+  $('btn-music').addEventListener('click', () => Music.toggle());
 });

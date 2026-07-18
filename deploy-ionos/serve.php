@@ -13,7 +13,7 @@ if (!heyeu_ist_angemeldet()) {
 $f = $_GET['f'] ?? 'index.html';
 
 /* Nur genau die erwarteten Dateien, keine Pfad-Tricks */
-if (!preg_match('~^(index\.html|css/[a-z0-9_-]+\.css|js/[a-z0-9_-]+\.js)$~', $f)) {
+if (!preg_match('~^(index\.html|css/[a-z0-9_-]+\.css|js/[a-z0-9_-]+\.js|musik/[a-z0-9_-]+\.mp3)$~', $f)) {
     http_response_code(404);
     exit;
 }
@@ -27,9 +27,11 @@ if (!is_file($pfad)) {
 $mime = [
     'html' => 'text/html; charset=utf-8',
     'css'  => 'text/css; charset=utf-8',
-    'js'   => 'application/javascript; charset=utf-8'
+    'js'   => 'application/javascript; charset=utf-8',
+    'mp3'  => 'audio/mpeg'
 ][pathinfo($f, PATHINFO_EXTENSION)];
 
 header('Content-Type: ' . $mime);
 header('Cache-Control: private, max-age=300');
+header('Content-Length: ' . filesize($pfad));
 readfile($pfad);
