@@ -636,14 +636,28 @@ function updateHud() {
   $('hud-task-count').textContent = open ? ` (${open})` : '';
 }
 
+let lastCountry = null, lastWelcome = 0;
+
 function updateLocationHud() {
   const t = World.tileAt(state.player.tx, state.player.ty);
   const el = $('hud-location');
-  if (t && t.c >= 0) {
+  if (!t) return;
+  if (t.c >= 0) {
     const c = COUNTRIES[t.c];
     el.textContent = `${c.flag} ${c.name}`;
+    // Begrüßung beim Grenzübertritt – Grenzen sind offen, aber wir sagen Hallo!
+    if (lastCountry !== c.id) {
+      lastCountry = c.id;
+      const now = Date.now();
+      if (now - lastWelcome > 4000) {
+        lastWelcome = now;
+        toast(`Willkommen in ${c.name}! ${c.flag}`);
+      }
+    }
+  } else if (t.t === T_BRIDGE) {
+    el.textContent = '🌊 Auf der Überfahrt';
   } else {
-    el.textContent = '🌊 Auf See';
+    el.textContent = '🌍 Europa';
   }
 }
 

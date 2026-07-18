@@ -1,7 +1,8 @@
 /* ============================================================
-   hey EU – Weltkarte bauen & vorrendern
-   Die Länderformen aus data.js werden mit MAP_SCALE vergrößert,
-   damit jedes Land mehr Platz zum Laufen bietet.
+   hey EU – Weltkarte: zusammenhängendes Europa
+   Liest die ASCII-Europakarte aus js/mapdata.js, skaliert sie
+   mit MAP_SCALE und rendert sie vor. Länder gehen ohne Grenzen
+   ineinander über; Brücken gibt es nur zu den Inseln.
    ============================================================ */
 
 function makeRng(seed) {
@@ -13,11 +14,12 @@ function makeRng(seed) {
 }
 
 const World = {
-  grid: null,          // [y][x] -> { t: Kacheltyp, c: Länderindex|-1 }
-  centers: {},         // Länder-ID -> {x, y}
+  grid: null,          // [y][x] -> { t: Kacheltyp, c: Länderindex | -1 }
+  centers: {},         // Länder-ID -> begehbare Kachel nahe der Landesmitte
+  countryCells: [],    // pro Länderindex: Liste aller Landeskacheln
   landmarks: [],       // { x, y, ci }
   boards: [],          // Pinnwände { x, y, ci }
-  canvases: [],        // 2 vorgerenderte Karten (Wellen-Phasen)
+  canvases: [],
 
   isWalkable(x, y) {
     if (x < 0 || y < 0 || x >= WORLD_W || y >= WORLD_H) return false;
@@ -31,43 +33,52 @@ const World = {
   },
 
   build() {
-    const rng = makeRng(20260715);
+    const rng = makeRng(20260718);
     const S = MAP_SCALE;
+    const idToIndex = {};
+    COUNTRIES.forEach((c, ci) => { idToIndex[c.id] = ci; });
+
     this.grid = [];
     this.landmarks = [];
     this.boards = [];
+    this.countryCells = COUNTRIES.map(() => []);
+    const sums = COUNTRIES.map(() => ({ x: 0, y: 0, n: 0 }));
+
     for (let y = 0; y < WORLD_H; y++) {
       const row = [];
-      for (let x = 0; x < WORLD_W; x++) row.push({ t: T_SEA, c: -1 });
+      const mapRow = EUROPE_MAP[Math.floor(y / S)];
+      for (let x = 0; x < WORLD_W; x++) {
+        const ch = mapRow[Math.floor(x / S)];
+        if (ch === '.') { row.push({ t: T_SEA, c: -1 }); continue; }
+        if (ch === '_') { row.push({ t: T_GRASS, c: -1 }); continue; }
+        const ci = idToIndex[MAP_CHARS[ch]];
+        row.push({ t: T_GRASS, c: ci });
+        this.countryCells[ci].push({ x, y });
+        sums[ci].x += x; sums[ci].y += y; sums[ci].n++;
+      }
       this.grid.push(row);
     }
 
-    // Länder vergrößert stempeln (jede Formzelle wird SxS Kacheln)
+    // Landesmitte: begehbare Landeskachel, die dem Schwerpunkt am nächsten ist
     COUNTRIES.forEach((c, ci) => {
-      let sx = 0, sy = 0, n = 0;
-      c.shape.forEach((rowStr, ry) => {
-        for (let rx = 0; rx < rowStr.length; rx++) {
-          if (rowStr[rx] !== '#') continue;
-          for (let dy = 0; dy < S; dy++) {
-            for (let dx = 0; dx < S; dx++) {
-              const x = (c.x + rx) * S + dx, y = (c.y + ry) * S + dy;
-              this.grid[y][x] = { t: T_GRASS, c: ci };
-              sx += x; sy += y; n++;
-            }
-          }
-        }
-      });
-      this.centers[c.id] = { x: Math.round(sx / n), y: Math.round(sy / n) };
+      const s = sums[ci];
+      const cx = s.x / s.n, cy = s.y / s.n;
+      let best = null, bestD = Infinity;
+      for (const cell of this.countryCells[ci]) {
+        const d = (cell.x - cx) ** 2 + (cell.y - cy) ** 2;
+        if (d < bestD) { bestD = d; best = cell; }
+      }
+      this.centers[c.id] = { x: best.x, y: best.y };
     });
 
-    // Wahrzeichen
+    // Wahrzeichen an der Landesmitte
     COUNTRIES.forEach((c, ci) => {
-      const x = (c.x + c.lm.dx) * S, y = (c.y + c.lm.dy) * S;
-      this.grid[y][x] = { t: T_LANDMARK, c: ci };
-      this.landmarks.push({ x, y, ci });
+      const p = this.centers[c.id];
+      this.grid[p.y][p.x].t = T_LANDMARK;
+      this.landmarks.push({ x: p.x, y: p.y, ci });
     });
 
-    // Seebrücken: 2 Kacheln breite Treppenpfade zwischen Zentren
+    // Brücken/Fähren: 2 Kacheln breiter Treppenpfad, nur über Meer
     for (const [a, b] of BRIDGES) {
       const p = this.centers[a], q = this.centers[b];
       let x = p.x, y = p.y;
@@ -79,28 +90,26 @@ const World = {
         const dx = q.x - x, dy = q.y - y;
         if (Math.abs(dx) >= Math.abs(dy)) {
           x += Math.sign(dx);
-          carve(x, y); carve(x, y + 1);   // horizontal: 2 hoch
+          carve(x, y); carve(x, y + 1);
         } else {
           y += Math.sign(dy);
-          carve(x, y); carve(x + 1, y);   // vertikal: 2 breit
+          carve(x, y); carve(x + 1, y);
         }
       }
     }
 
-    // Pinnwand in jedem Land: freie Wiese nahe dem Zentrum
+    // Pinnwand: freie Kachel in der Nähe des Wahrzeichens
     COUNTRIES.forEach((c, ci) => {
       const center = this.centers[c.id];
       let spot = null;
       outer:
-      for (let r = 1; r < 8; r++) {
+      for (let r = 2; r < 10; r++) {
         for (let dy = -r; dy <= r; dy++) {
           for (let dx = -r; dx <= r; dx++) {
+            if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
             const x = center.x + dx, y = center.y + dy;
             const t = this.tileAt(x, y);
-            if (t && t.t === T_GRASS && t.c === ci &&
-                !this.landmarks.some(l => Math.abs(l.x - x) + Math.abs(l.y - y) < 2)) {
-              spot = { x, y }; break outer;
-            }
+            if (t && t.t === T_GRASS && t.c === ci) { spot = { x, y }; break outer; }
           }
         }
       }
@@ -110,7 +119,7 @@ const World = {
       }
     });
 
-    // Deko: Bäume, Berge, Blumen (nie neben Brücken, Wahrzeichen, Pinnwänden)
+    // Deko: Bäume, Berge, Blumen (nicht neben Brücken, Wahrzeichen, Pinnwänden)
     const nearType = (x, y, type) => {
       for (let dy = -1; dy <= 1; dy++)
         for (let dx = -1; dx <= 1; dx++) {
@@ -119,22 +128,26 @@ const World = {
         }
       return false;
     };
+    const bergLaender = ['no', 'ch', 'at', 'is', 'ro', 'es', 'it'];
     for (let y = 0; y < WORLD_H; y++) {
       for (let x = 0; x < WORLD_W; x++) {
         const cell = this.grid[y][x];
         if (cell.t !== T_GRASS) continue;
         if (nearType(x, y, T_BRIDGE) || nearType(x, y, T_LANDMARK) || nearType(x, y, T_BOARD)) continue;
         const r = rng();
+        if (cell.c === -1) {           // neutrales Land: etwas mehr Wald
+          if (r < 0.10) cell.t = T_TREE;
+          else if (r < 0.13) cell.t = T_FLOWER;
+          continue;
+        }
         const country = COUNTRIES[cell.c];
-        const center = this.centers[country.id];
-        if (Math.abs(center.x - x) + Math.abs(center.y - y) < 3) continue;
-        if (r < 0.06) cell.t = T_TREE;
-        else if (r < 0.09 && ['no', 'ch', 'at', 'is', 'ro'].includes(country.id)) cell.t = T_MOUNTAIN;
-        else if (r < 0.15) cell.t = T_FLOWER;
+        if (r < 0.055) cell.t = T_TREE;
+        else if (r < 0.085 && bergLaender.includes(country.id)) cell.t = T_MOUNTAIN;
+        else if (r < 0.14) cell.t = T_FLOWER;
       }
     }
 
-    // Wassertiefe: Abstand zum Land (0 = direkt an Land, 2 = tiefes Meer)
+    // Wassertiefe (für Farbverlauf im Meer)
     this.depth = [];
     const queue = [];
     for (let y = 0; y < WORLD_H; y++) {
@@ -163,7 +176,7 @@ const World = {
   },
 
   prerender() {
-    const S = MAP_SCALE;
+    const NEUTRAL_GRASS = '#a3c48b';
     this.canvases = [0, 1].map(phase => {
       const cv = document.createElement('canvas');
       cv.width = WORLD_W * TILE;
@@ -191,7 +204,7 @@ const World = {
           } else if (cell.t === T_BRIDGE) {
             drawBridgeTile(ctx, px, py, x, y, phase);
           } else {
-            const color = COUNTRIES[cell.c].grass;
+            const color = cell.c >= 0 ? COUNTRIES[cell.c].grass : NEUTRAL_GRASS;
             const sea = (xx, yy) => {
               const t = this.tileAt(xx, yy);
               return !t || t.t === T_SEA || t.t === T_BRIDGE;
@@ -207,12 +220,10 @@ const World = {
         }
       }
 
-      // Pinnwände (mit Überhang nach oben)
       for (const b of this.boards) {
         drawPinboard(ctx, b.x * TILE, b.y * TILE);
       }
 
-      // Wahrzeichen-Embleme
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.font = '24px "Segoe UI Emoji", "Noto Color Emoji", serif';
@@ -220,41 +231,28 @@ const World = {
         ctx.fillText(COUNTRIES[lm.ci].lm.emoji, lm.x * TILE + TILE / 2, lm.y * TILE + 1);
       }
 
-      // Ländernamen
+      // Ländernamen über dem Wahrzeichen
       ctx.font = 'bold 11px "Trebuchet MS", sans-serif';
       for (const c of COUNTRIES) {
-        const w = Math.max(...c.shape.map(s2 => s2.length)) * S;
-        const cx = (c.x * S + w / 2) * TILE;
-        const cy = c.y * S * TILE - 8;
+        const p = this.centers[c.id];
         const label = `${c.flag} ${c.name}`;
         ctx.lineWidth = 4;
         ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-        ctx.strokeText(label, cx, cy);
+        ctx.strokeText(label, p.x * TILE + TILE / 2, p.y * TILE - 22);
         ctx.fillStyle = '#20406a';
-        ctx.fillText(label, cx, cy);
+        ctx.fillText(label, p.x * TILE + TILE / 2, p.y * TILE - 22);
       }
       return cv;
     });
   },
 
   randomSpotIn(ci, rng, taken) {
-    const c = COUNTRIES[ci];
-    const S = MAP_SCALE;
-    const spots = [];
-    c.shape.forEach((rowStr, ry) => {
-      for (let rx = 0; rx < rowStr.length; rx++) {
-        if (rowStr[rx] !== '#') continue;
-        for (let dy = 0; dy < S; dy++) {
-          for (let dx = 0; dx < S; dx++) {
-            const x = (c.x + rx) * S + dx, y = (c.y + ry) * S + dy;
-            const t = this.grid[y][x].t;
-            if ((t === T_GRASS || t === T_FLOWER) && !taken.has(x + ',' + y)) spots.push({ x, y });
-          }
-        }
-      }
+    const cells = this.countryCells[ci].filter(p => {
+      const t = this.grid[p.y][p.x].t;
+      return (t === T_GRASS || t === T_FLOWER) && !taken.has(p.x + ',' + p.y);
     });
-    if (!spots.length) return { ...this.centers[c.id] };
-    const s = spots[Math.floor(rng() * spots.length)];
+    if (!cells.length) return { ...this.centers[COUNTRIES[ci].id] };
+    const s = cells[Math.floor(rng() * cells.length)];
     taken.add(s.x + ',' + s.y);
     return s;
   }

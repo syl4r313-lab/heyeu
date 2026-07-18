@@ -5,13 +5,16 @@
    ============================================================ */
 
 const TILE = 16;              // Pixelgröße einer Kachel in der Vorlage
-const MAP_SCALE = 2;          // Länderformen werden 2x vergrößert
-const WORLD_W = 112 * MAP_SCALE;
-const WORLD_H = 80 * MAP_SCALE;
+const MAP_SCALE = 2;          // die Europakarte wird 2x vergrößert
+/* WORLD_W / WORLD_H stehen in js/mapdata.js (aus der Kartengröße abgeleitet) */
 
 /* Kachel-Typen */
 const T_SEA = 0, T_GRASS = 1, T_BRIDGE = 2, T_TREE = 3, T_MOUNTAIN = 4,
       T_FLOWER = 5, T_LANDMARK = 6, T_BOARD = 7;
+
+/* Hinweis: Die Felder shape/x/y/dx/dy in COUNTRIES stammen aus der alten
+   Insel-Karte und werden nicht mehr benutzt – die Umrisse kommen jetzt
+   aus der echten Europakarte in js/mapdata.js. */
 
 /* Länder: shape = '#' ist Land, '.' ist Meer.
    lm = Wahrzeichen (dx/dy relativ zur Form, muss auf '#' liegen). */
@@ -293,16 +296,14 @@ const COUNTRIES = [
   }
 ];
 
-/* Seebrücken / Wege zwischen den Ländern (begehbar) */
+/* Brücken/Fähren – nur dort, wo es sie (ungefähr) auch wirklich gibt.
+   Alle anderen Länder hängen auf der Europakarte direkt zusammen. */
 const BRIDGES = [
-  ['is', 'uk'], ['ie', 'uk'], ['uk', 'fr'],
-  ['fr', 'be'], ['be', 'nl'], ['nl', 'de'], ['be', 'de'], ['fr', 'de'],
-  ['fr', 'es'], ['es', 'pt'], ['fr', 'ch'], ['ch', 'it'], ['ch', 'at'],
-  ['at', 'de'], ['at', 'it'], ['at', 'cz'], ['at', 'hu'],
-  ['cz', 'de'], ['cz', 'pl'], ['de', 'pl'], ['de', 'dk'],
-  ['dk', 'se'], ['dk', 'no'], ['se', 'no'], ['se', 'fi'],
-  ['fi', 'ee'], ['ee', 'lv'], ['lv', 'lt'], ['lt', 'pl'],
-  ['hu', 'hr'], ['hu', 'ro'], ['it', 'hr'], ['hr', 'gr']
+  ['uk', 'fr'],   // Eurotunnel
+  ['ie', 'uk'],   // Fähre Dublin–Wales
+  ['is', 'uk'],   // Fährlinie nach Island
+  ['dk', 'se'],   // Öresundbrücke
+  ['fi', 'ee']    // Fähre Helsinki–Tallinn
 ];
 
 /* Moderator:innen – stellen Aufgaben (Quiz & Reise-Aufgaben) */
