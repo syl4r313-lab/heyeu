@@ -305,18 +305,43 @@ function renderCharFrame(cfg, dir, pose, flip) {
   return cv;
 }
 
-/* Alle Bilder einer Figur: down/up/left/right jeweils stand, 2 Schritte,
-   Sprung und Winken */
+const CHAR_DIRS = { down: ['down', false], up: ['up', false], right: ['side', false], left: ['side', true] };
+
+/* Bildersatz einer Figur.
+   Wichtig: Die Einzelbilder entstehen erst, wenn sie zum ersten Mal
+   gebraucht werden. Alle 20 Bilder für alle 99 Figuren im Voraus zu
+   zeichnen wären rund 48 MB Grafikspeicher – daran scheitern Handys.
+   Figuren mit gleichem Aussehen teilen sich denselben Satz. */
+const _spriteSets = new Map();
+
+function charKey(cfg) {
+  return [cfg.skin, cfg.hair, cfg.hairStyle, cfg.shirt].join('|');
+}
+
 function makeCharacterSprites(cfg) {
-  const frames = {};
-  const dirs = { down: ['down', false], up: ['up', false], right: ['side', false], left: ['side', true] };
-  for (const key in dirs) {
-    const [d, flip] = dirs[key];
-    for (const poseName in CHAR_POSES) {
-      frames[key + '_' + poseName] = renderCharFrame(cfg, d, CHAR_POSES[poseName], flip);
+  const key = charKey(cfg);
+  let satz = _spriteSets.get(key);
+  if (satz) return satz;
+
+  const cache = {};
+  satz = {
+    get(dirKey, poseName) {
+      const k = dirKey + '_' + poseName;
+      let bild = cache[k];
+      if (!bild) {
+        const dir = CHAR_DIRS[dirKey] || CHAR_DIRS.down;
+        bild = renderCharFrame(cfg, dir[0], (CHAR_POSES[poseName] || 0), dir[1]);
+        cache[k] = bild;
+      }
+      return bild;
     }
+  };
+  _spriteSets.set(key, satz);
+  // Bei sehr vielen verschiedenen Figuren den ältesten Satz verwerfen
+  if (_spriteSets.size > 120) {
+    _spriteSets.delete(_spriteSets.keys().next().value);
   }
-  return frames;
+  return satz;
 }
 
 function randomCharConfig(rng) {

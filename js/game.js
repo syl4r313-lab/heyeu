@@ -895,7 +895,7 @@ function drawActor(a, camX, camY, tp) {
   ctx.ellipse(x, groundY - tp * 0.06, tp * 0.3 * shrink, tp * 0.11 * shrink, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  const frame = a.frames[a.dir + '_' + actorPose(a)];
+  const frame = a.frames.get(a.dir, actorPose(a));
   if (!frame) return;
   const scale = (tp * 1.75) / SPRITE_H;
   const w = SPRITE_W * scale, h = SPRITE_H * scale;
