@@ -24,11 +24,13 @@ const body = html.slice(html.indexOf('<body>') + 6, html.lastIndexOf('</body>'))
   .trim();
 
 const titel = (html.match(/<title>([^<]+)<\/title>/) || [, 'hey EU'])[1];
-const favicon = (html.match(/<link rel="icon"[^>]*>/) || [''])[0];
+
+/* Das Favicon wird bewusst NICHT übernommen: Der Artifact-Dienst setzt
+   sein eigenes, und die Bild-Adresse enthält spitze Klammern, an denen
+   sich ein einfaches Suchmuster verschluckt. */
 
 const teile = [];
 teile.push(`<title>${titel}</title>`);
-if (favicon) teile.push(favicon);
 teile.push(`<style>\n${css}\n</style>`);
 teile.push(body);
 teile.push(`<script>\n/* Musik direkt eingebettet, damit die Seite ohne Server auskommt */\nconst MUSIC_SRC_OVERRIDE = ${JSON.stringify(musikUrl)};\n</script>`);
@@ -38,6 +40,22 @@ for (const s of skripte) {
 }
 
 const out = teile.join('\n\n');
+
+/* Sicherheitsprüfung: In einem Attributwert darf keine offene spitze
+   Klammer stehen – sonst reißt der Browser das ganze Dokument auseinander
+   und zeigt zum Beispiel das Stylesheet als Text an. */
+const kopfTeil = out.slice(0, out.indexOf('<style>'));
+if (/<[a-z][^>]*"[^"]*<[^"]*"/i.test(kopfTeil) || kopfTeil.split('"').length % 2 === 0) {
+  throw new Error('Kaputtes Markup vor dem Stylesheet – Anführungszeichen unausgeglichen:\n' + kopfTeil);
+}
+const styleAuf = (out.match(/<style\b/gi) || []).length;
+const styleZu = (out.match(/<\/style>/gi) || []).length;
+const skriptAuf = (out.match(/<script\b/gi) || []).length;
+const skriptZu = (out.match(/<\/script>/gi) || []).length;
+if (styleAuf !== styleZu || skriptAuf !== skriptZu) {
+  throw new Error(`Tags unausgeglichen: style ${styleAuf}/${styleZu}, script ${skriptAuf}/${skriptZu}`);
+}
+
 fs.writeFileSync(ziel, out);
 const mb = (Buffer.byteLength(out) / 1048576).toFixed(2);
 console.log('Geschrieben:', ziel);
