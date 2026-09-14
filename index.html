@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#4aa3e8">
+  <meta name="theme-color" content="#2f6fb5">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>hey EU – Entdecke Europa!</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇪🇺</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23003399'/><g fill='%23ffcc00'><circle cx='16' cy='7' r='1.9'/><circle cx='16' cy='25' r='1.9'/><circle cx='7' cy='16' r='1.9'/><circle cx='25' cy='16' r='1.9'/><circle cx='9.6' cy='9.6' r='1.9'/><circle cx='22.4' cy='22.4' r='1.9'/><circle cx='22.4' cy='9.6' r='1.9'/><circle cx='9.6' cy='22.4' r='1.9'/></g></svg>">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,31 +17,35 @@
     <div class="title-box">
       <div class="title-logo">
         <span class="logo-hey">hey</span><span class="logo-eu">EU</span>
-        <span class="logo-flag">🇪🇺</span>
       </div>
-      <p class="title-sub">Dein Europa-Abenteuer! 🌍<br>
-        Triff Kinder aus ganz Europa, entdecke Wahrzeichen<br>und löse Aufgaben.</p>
-      <button id="btn-continue" class="big-btn hidden">▶️ Weiterspielen</button>
-      <button id="btn-new" class="big-btn alt">✨ Neues Abenteuer</button>
-      <p class="title-hint">Läuft auf Handy 📱 und Computer 💻</p>
+      <p class="title-sub">Dein Europa-Abenteuer!<br>
+        Triff Kinder aus ganz Europa, entdecke Wahrzeichen und löse Aufgaben.</p>
+      <button id="btn-continue" class="big-btn hidden" data-icon="play" data-icon-size="22" data-icon-label="Weiterspielen"></button>
+      <button id="btn-new" class="big-btn alt" data-icon="sparkle" data-icon-size="22" data-icon-label="Neues Abenteuer"></button>
+      <p class="title-hint" data-icon="device" data-icon-size="17" data-icon-label="Läuft auf Handy und Computer"></p>
     </div>
   </div>
 
   <!-- ===== Charakter-Editor ===== -->
   <div id="screen-creator" class="screen hidden">
     <div class="creator-box">
-      <h1>Gestalte deine Figur! 🎨</h1>
+      <h1>Gestalte deine Figur</h1>
       <div class="creator-grid">
         <div class="creator-left">
-          <canvas id="creator-preview" width="160" height="170"></canvas>
+          <canvas id="creator-preview" width="170" height="190" title="Antippen zum Hüpfen"></canvas>
+          <button id="btn-preview-hop" class="pill" type="button"
+                  data-icon="jump" data-icon-size="17" data-icon-label="Hüpfen"></button>
         </div>
         <div class="creator-right">
-          <label>Dein Name</label>
-          <input id="creator-name" type="text" maxlength="14" placeholder="Wie heißt du?">
+          <label for="creator-name">Dein Name</label>
+          <input id="creator-name" type="text" maxlength="14" placeholder="Wie heißt du?" autocomplete="off">
           <p id="creator-name-error" class="field-error"></p>
 
-          <label>Dein Heimatland</label>
-          <select id="creator-country"></select>
+          <label for="creator-country">Aus welchem Land kommst du?</label>
+          <input id="creator-country" type="text" maxlength="30" list="country-list"
+                 placeholder="Land eintippen …" autocomplete="off">
+          <datalist id="country-list"></datalist>
+          <p id="creator-country-hint" class="field-hint"></p>
 
           <label>Hautfarbe</label>
           <div id="creator-skins" class="swatches"></div>
@@ -56,7 +60,7 @@
           <div id="creator-shirts" class="swatches"></div>
         </div>
       </div>
-      <button id="btn-create-done" class="big-btn">🚀 Los geht's!</button>
+      <button id="btn-create-done" class="big-btn" data-icon="rocket" data-icon-size="22" data-icon-label="Los geht's!"></button>
     </div>
   </div>
 
@@ -64,105 +68,108 @@
   <div id="screen-game" class="screen hidden">
     <div id="game-canvas-holder"></div>
 
-    <!-- HUD oben -->
+    <!-- Kopfleiste -->
     <div id="hud">
-      <div class="hud-chip"><span id="hud-flag">🇪🇺</span> <b id="hud-name"></b></div>
-      <div class="hud-chip" id="hud-location">🌍</div>
-      <div class="hud-chip">⭐ <b id="hud-stars">0</b></div>
+      <div class="hud-chip"><span id="hud-flag"></span> <b id="hud-name"></b></div>
+      <div class="hud-chip" id="hud-location"></div>
+      <div class="hud-chip stars" data-icon="star" data-icon-size="17"><b id="hud-stars">0</b></div>
       <div class="hud-spacer"></div>
-      <button class="hud-btn" id="btn-tasks">📋<span id="hud-task-count"></span></button>
-      <button class="hud-btn" id="btn-map">🗺️</button>
-      <button class="hud-btn" id="btn-music" aria-label="Musik an/aus">🔊</button>
-      <button class="hud-btn" id="btn-help">❓</button>
+      <button class="hud-btn" id="btn-tasks" aria-label="Aufgaben" data-icon="tasks"><span id="hud-task-count" class="badge-count hidden"></span></button>
+      <button class="hud-btn" id="btn-map" aria-label="Karte" data-icon="map"></button>
+      <button class="hud-btn" id="btn-music" aria-label="Musik an oder aus"></button>
+      <button class="hud-btn" id="btn-help" aria-label="Hilfe" data-icon="help"></button>
     </div>
 
-    <!-- Touch-Steuerung -->
+    <!-- Steuerung -->
     <div id="dpad" aria-label="Steuerkreuz">
-      <button data-dir="up" style="grid-area:u">▲</button>
-      <button data-dir="left" style="grid-area:l">◀</button>
-      <button data-dir="right" style="grid-area:r">▶</button>
-      <button data-dir="down" style="grid-area:d">▼</button>
+      <button data-dir="up" style="grid-area:u" aria-label="nach oben"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 6 20 18H4z" fill="currentColor"/></svg></button>
+      <button data-dir="left" style="grid-area:l" aria-label="nach links"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M6 12 18 4v16z" fill="currentColor"/></svg></button>
+      <button data-dir="right" style="grid-area:r" aria-label="nach rechts"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M18 12 6 20V4z" fill="currentColor"/></svg></button>
+      <button data-dir="down" style="grid-area:d" aria-label="nach unten"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M12 18 4 6h16z" fill="currentColor"/></svg></button>
     </div>
-    <button id="btn-action" aria-label="Aktion">A</button>
+    <div id="action-buttons">
+      <button id="btn-jump" aria-label="Hüpfen" data-icon="jump" data-icon-size="26"></button>
+      <button id="btn-action" aria-label="Anschauen oder sprechen" data-icon="chat" data-icon-size="26"></button>
+    </div>
 
     <!-- Chat -->
     <div id="chat-panel" class="hidden">
       <div class="chat-head">
         <span id="chat-title"></span>
-        <button id="chat-close">✕</button>
+        <button id="chat-close" aria-label="Chat schließen" data-icon="close" data-icon-size="18"></button>
       </div>
       <div id="chat-messages"></div>
       <div id="chat-quick"></div>
       <div class="chat-inputrow">
-        <input id="chat-input" type="text" maxlength="120" placeholder="Schreib etwas…">
-        <button id="chat-send">➤</button>
+        <input id="chat-input" type="text" maxlength="120" placeholder="Schreib etwas …">
+        <button id="chat-send" aria-label="Senden" data-icon="send" data-icon-size="20"></button>
       </div>
     </div>
 
     <!-- Wahrzeichen-Info -->
     <div id="info-card" class="panel hidden">
-      <div id="info-emoji"></div>
+      <div id="info-art"></div>
       <h2 id="info-title"></h2>
-      <p id="info-country" class="muted"></p>
+      <p id="info-country" class="muted flagline"></p>
       <p id="info-text"></p>
-      <button id="info-close" class="big-btn small">Toll! 👍</button>
+      <button id="info-close" class="big-btn small">Toll!</button>
     </div>
 
     <!-- Aufgabenliste -->
     <div id="task-panel" class="panel hidden">
-      <div class="panel-head"><h2>📋 Deine Aufgaben</h2><button class="panel-close">✕</button></div>
+      <div class="panel-head"><h2 data-icon="tasks" data-icon-size="20" data-icon-label="Deine Aufgaben"></h2><button class="panel-close" aria-label="Schließen" data-icon="close" data-icon-size="18"></button></div>
       <p id="task-progress" class="muted"></p>
       <div id="task-list"></div>
     </div>
 
     <!-- Karte -->
     <div id="map-panel" class="panel hidden">
-      <div class="panel-head"><h2>🗺️ Europa</h2><button class="panel-close">✕</button></div>
-      <canvas id="minimap" width="336" height="240"></canvas>
-      <p class="muted">Der rote Punkt bist du! Die Holzstege verbinden die Länder.</p>
+      <div class="panel-head"><h2 data-icon="map" data-icon-size="20" data-icon-label="Europa"></h2><button class="panel-close" aria-label="Schließen" data-icon="close" data-icon-size="18"></button></div>
+      <canvas id="minimap" width="336" height="278"></canvas>
+      <p class="muted">Der rote Punkt bist du. Die dunklen Punkte sind Wahrzeichen, die Holzstege führen auf die Inseln.</p>
     </div>
 
     <!-- Hilfe -->
     <div id="help-panel" class="panel hidden">
-      <div class="panel-head"><h2>❓ So spielst du</h2><button class="panel-close">✕</button></div>
+      <div class="panel-head"><h2 data-icon="help" data-icon-size="20" data-icon-label="So spielst du"></h2><button class="panel-close" aria-label="Schließen" data-icon="close" data-icon-size="18"></button></div>
       <ul class="help-list">
-        <li>🚶 <b>Laufen:</b> Pfeiltasten / WASD oder Steuerkreuz</li>
-        <li>💬 <b>Chatten:</b> Stell dich neben ein Kind und drücke <b>A</b> (oder Leertaste). Jeder Chat beginnt mit „hey EU“!</li>
-        <li>⭐ <b>Aufgaben:</b> Moderator:innen tragen goldene Shirts – sie geben dir Quizfragen und Reise-Aufgaben.</li>
-        <li>📌 <b>Pinnwände:</b> In jedem Land steht eine Pinnwand mit besonderen Mitmach-Aufgaben. Deine Beiträge werden von Admins geprüft und freigeschaltet.</li>
-        <li>🗼 <b>Wahrzeichen:</b> Stell dich davor und drücke <b>A</b>, um etwas zu lernen.</li>
-        <li>🌉 <b>Reisen:</b> Über die Holzstege läufst du von Land zu Land.</li>
+        <li data-icon="walk" data-icon-size="22"><b>Laufen:</b> Pfeiltasten, WASD oder das Steuerkreuz.</li>
+        <li data-icon="jump" data-icon-size="22"><b>Hüpfen:</b> Taste <b>J</b> oder der Sprung-Knopf. Geht auch im Laufen!</li>
+        <li data-icon="chat" data-icon-size="22"><b>Sprechen:</b> Stell dich neben ein Kind und drücke <b>A</b> oder die Leertaste. Jeder Chat beginnt mit „hey EU“.</li>
+        <li data-icon="star" data-icon-size="22"><b>Aufgaben:</b> Moderator:innen tragen goldene Shirts. Sie geben dir Quizfragen und Reise-Aufgaben.</li>
+        <li data-icon="board" data-icon-size="22"><b>Pinnwände:</b> In jedem Land steht eine Pinnwand mit Mitmach-Aufgaben. Beiträge werden von Admins geprüft.</li>
+        <li data-icon="landmarkPin" data-icon-size="22"><b>Wahrzeichen:</b> Stell dich davor und drücke <b>A</b>, um etwas zu lernen.</li>
+        <li data-icon="wave" data-icon-size="22"><b>Reisen:</b> Über die Holzstege kommst du auf die Inseln. Alle anderen Grenzen sind offen.</li>
       </ul>
-      <button id="btn-admin" class="pill">🛡️ Admin-Bereich</button>
+      <button id="btn-admin" class="pill" data-icon="shield" data-icon-size="17" data-icon-label="Admin-Bereich"></button>
     </div>
 
     <!-- Pinnwand -->
     <div id="board-panel" class="panel wide hidden">
-      <div class="panel-head"><h2 id="board-title">📌 Pinnwand</h2><button class="panel-close">✕</button></div>
+      <div class="panel-head"><h2 id="board-title" class="flagline">Pinnwand</h2><button class="panel-close" aria-label="Schließen" data-icon="close" data-icon-size="18"></button></div>
       <div id="board-list"></div>
       <div id="board-gallery"></div>
     </div>
 
     <!-- Beitrag einreichen -->
     <div id="submit-panel" class="panel hidden">
-      <div class="panel-head"><h2 id="submit-title"></h2><button class="panel-close">✕</button></div>
+      <div class="panel-head"><h2 id="submit-title"></h2><button class="panel-close" aria-label="Schließen" data-icon="close" data-icon-size="18"></button></div>
       <p id="submit-desc" class="muted"></p>
-      <textarea id="submit-text" rows="4" maxlength="500" placeholder="Schreibe hier deinen Beitrag…"></textarea>
-      <label class="file-btn">
-        📷 Foto auswählen
+      <textarea id="submit-text" rows="4" maxlength="500" placeholder="Schreibe hier deinen Beitrag …"></textarea>
+      <label class="file-btn" data-icon="camera" data-icon-size="18" data-icon-label="Foto auswählen">
         <input id="submit-photo-input" type="file" accept="image/*">
       </label>
       <img id="submit-photo-preview" class="hidden" alt="Foto-Vorschau">
       <p id="submit-error" class="field-error"></p>
       <div class="submit-row">
         <button id="submit-cancel" class="pill">Abbrechen</button>
-        <button id="submit-send" class="big-btn small">📬 Einreichen</button>
+        <button id="submit-send" class="big-btn small" data-icon="inbox" data-icon-size="19" data-icon-label="Einreichen"></button>
       </div>
     </div>
 
     <!-- Admin: PIN -->
     <div id="admin-pin-panel" class="panel hidden">
-      <div class="panel-head"><h2>🛡️ Admin-Bereich</h2><button class="panel-close">✕</button></div>
+      <div class="panel-head"><h2 data-icon="shield" data-icon-size="20" data-icon-label="Admin-Bereich"></h2><button class="panel-close" aria-label="Schließen" data-icon="close" data-icon-size="18"></button></div>
       <p class="muted">Nur für Administrator:innen. Bitte PIN eingeben:</p>
       <input id="admin-pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="PIN">
       <p id="admin-pin-error" class="field-error"></p>
@@ -171,7 +178,7 @@
 
     <!-- Admin: Beiträge prüfen -->
     <div id="admin-panel" class="panel wide hidden">
-      <div class="panel-head"><h2>🛡️ Beiträge prüfen</h2><button class="panel-close">✕</button></div>
+      <div class="panel-head"><h2 data-icon="shield" data-icon-size="20" data-icon-label="Beiträge prüfen"></h2><button class="panel-close" aria-label="Schließen" data-icon="close" data-icon-size="18"></button></div>
       <p id="admin-count" class="muted"></p>
       <div id="admin-list"></div>
     </div>
@@ -181,6 +188,10 @@
 
   <script src="js/data.js"></script>
   <script src="js/mapdata.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/flags.js"></script>
+  <script src="js/landmarks.js"></script>
+  <script src="js/terrain.js"></script>
   <script src="js/filter.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/sprites.js"></script>

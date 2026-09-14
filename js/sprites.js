@@ -1,275 +1,19 @@
 /* ============================================================
-   hey EU – Pixel-Sprites (Charaktere & Kacheln)
-   Figuren: 16x22 Pixel, mit Umriss, Schattierung und Glanzlicht.
-   Zeichencodes: . leer | o Umriss | H Haare | h Haar-Glanz
-   S Haut | s Haut-Schatten | E Auge | W Augen-Glanz
-   T Shirt | t Shirt-Schatten | P Hose | O Schuhe | A Arm (Haut)
+   hey EU – Figuren
+   Die Figuren werden gezeichnet (nicht aus Pixelrastern gebaut),
+   damit sie zum Stil der Wahrzeichen passen und in jeder Größe
+   sauber aussehen.
+   Zeichenraum: x von -11 bis 11, Füße bei y = 0, Kopf bei y = -30.
    ============================================================ */
 
-const HEADS = {
-  kurz: {
-    down: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHhHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHSSSSSSSSHo..',
-      '.oHSSSSSSSSSSHo.',
-      '.oSSEWSSSSEWSSo.',
-      '.oSSSSSSssSSSSo.',
-      '..oSSSSSSSSSSo..',
-      '..osSSSSSSSSso..',
-      '....oossssoo....'
-    ],
-    up: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHhHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '....oossssoo....'
-    ],
-    side: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHHhHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHSSSSSSo..',
-      '.oHHHHHSSSSSSo..',
-      '.oHHHHSSSEWSSo..',
-      '.oHHHHSSSSSSSo..',
-      '..oHHSSSSSSSo...',
-      '..osHSSSSSSso...',
-      '....oossssoo....'
-    ]
-  },
-  lang: {
-    down: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHhHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHSSSSSSHHo..',
-      '.oHHSSSSSSSSHHo.',
-      '.oHSEWSSSSEWSHo.',
-      '.oHSSSSSssSSSHo.',
-      '.oHHSSSSSSSSHHo.',
-      '.oHHsSSSSSSsHHo.',
-      '..oHHossssoHHo..'
-    ],
-    up: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHhHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '.oHhHHHHHHHHhHo.',
-      '..oHHHHHHHHHHo..'
-    ],
-    side: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHHhHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHSSSSSSo..',
-      '.oHHHHHSSSSSSo..',
-      '.oHHHHSSSEWSSo..',
-      '.oHHHHSSSSSSSo..',
-      '.oHHHHSSSSSSo...',
-      '.oHhHHsSSSSso...',
-      '..oHHHossssoo...'
-    ]
-  },
-  wuschel: {
-    down: [
-      '...oo.oooo.oo...',
-      '..oHHoHHHHoHHo..',
-      '.oHHHHHHHHHHHHo.',
-      '.oHhHHHHHHHHhHo.',
-      '.oHHHHHHHHHHHHo.',
-      '..oHSSSSSSSSHo..',
-      '.oHSSSSSSSSSSHo.',
-      '.oSSEWSSSSEWSSo.',
-      '.oSSSSSSssSSSSo.',
-      '..oSSSSSSSSSSo..',
-      '..osSSSSSSSSso..',
-      '....oossssoo....'
-    ],
-    up: [
-      '...oo.oooo.oo...',
-      '..oHHoHHHHoHHo..',
-      '.oHHHHHHHHHHHHo.',
-      '.oHhHHHHHHHHhHo.',
-      '.oHHHHHHHHHHHHo.',
-      '..oHHHHHHHHHHo..',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '....oossssoo....'
-    ],
-    side: [
-      '...oo.oooo.oo...',
-      '..oHHoHHHHoHHo..',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHhHHHHHHHhHo.',
-      '.oHHHHHHHHHHHHo.',
-      '..oHHHHSSSSSSo..',
-      '.oHHHHHSSSSSSo..',
-      '.oHHHHSSSEWSSo..',
-      '.oHHHHSSSSSSSo..',
-      '..oHHHSSSSSSo...',
-      '..osHSSSSSSso...',
-      '....oossssoo....'
-    ]
-  },
-  pony: {
-    down: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHhHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '.oHHSSSSSSSSHHo.',
-      '.oHSEWSSSSEWSHo.',
-      '.oHSSSSSssSSSHo.',
-      '.oHHSSSSSSSSHHo.',
-      '..oosSSSSSSsoo..',
-      '....oossssoo....'
-    ],
-    up: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHhHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '.oHHHHHHHHHHHHo.',
-      '..oHHHHHHHHHHo..',
-      '....oossssoo....'
-    ],
-    side: [
-      '.....oooooo.....',
-      '....oHHHHHHo....',
-      '...oHHHHHHHHo...',
-      '..oHHhHHHHHHHo..',
-      '..oHHHHHHHHHHo..',
-      '..oHHHHHHHSSo...',
-      '.oHHHHHSSSSSSo..',
-      '.oHHHHSSSEWSSo..',
-      '.oHHHHSSSSSSSo..',
-      '.oHHHHSSSSSSo...',
-      '..oHHsSSSSSso...',
-      '....oossssoo....'
-    ]
-  }
-};
+const CHAR_UW = 22, CHAR_UH = 32;     // Zeichenraum in Einheiten
+const CHAR_PX = 3;                    // Pixel je Einheit beim Vorzeichnen
+const SPRITE_W = CHAR_UW * CHAR_PX;
+const SPRITE_H = CHAR_UH * CHAR_PX;
 
-const BODIES = {
-  down: [
-    [ // stehen
-      '....oTTTTTTo....',
-      '..ooTTTTTTTToo..',
-      '.oAoTTttttTToAo.',
-      '.oAoTTTTTTTToAo.',
-      '..ooTttttttToo..',
-      '...oPPPppPPPo...',
-      '...oPPPooPPPo...',
-      '...oPPo..oPPo...',
-      '...oOOo..oOOo...',
-      '....ooo..ooo....'
-    ],
-    [ // Schritt A
-      '....oTTTTTTo....',
-      '..ooTTTTTTTToo..',
-      '.oAoTTttttTToAo.',
-      '.oAoTTTTTTTToAo.',
-      '..ooTttttttToo..',
-      '...oPPPppPPPo...',
-      '...oPPPooPPo....',
-      '...oPPo.oPPo....',
-      '...oOOo.oOOo....',
-      '....ooo.ooo.....'
-    ],
-    [ // Schritt B
-      '....oTTTTTTo....',
-      '..ooTTTTTTTToo..',
-      '.oAoTTttttTToAo.',
-      '.oAoTTTTTTTToAo.',
-      '..ooTttttttToo..',
-      '...oPPPppPPPo...',
-      '....oPPooPPPo...',
-      '....oPPo.oPPo...',
-      '....oOOo.oOOo...',
-      '.....ooo.ooo....'
-    ]
-  ],
-  side: [
-    [
-      '.....oTTTTTo....',
-      '....oTTTTTTTo...',
-      '....oTtTTTTtAo..',
-      '....oTTTTTTTo...',
-      '.....oTttttTo...',
-      '.....oPPPPPo....',
-      '.....oPPoPPo....',
-      '.....oPPoPPo....',
-      '.....oOOoOOo....',
-      '......ooooo.....'
-    ],
-    [
-      '.....oTTTTTo....',
-      '....oTTTTTTTo...',
-      '....oTtTTTTtAo..',
-      '....oTTTTTTTo...',
-      '.....oTttttTo...',
-      '.....oPPPPPo....',
-      '....oPPooPPo....',
-      '....oPPo.oPPo...',
-      '....oOOo.oOOo...',
-      '.....ooo..ooo...'
-    ],
-    [
-      '.....oTTTTTo....',
-      '....oTTTTTTTo...',
-      '....oTtTTTTtAo..',
-      '....oTTTTTTTo...',
-      '.....oTttttTo...',
-      '.....oPPPPPo....',
-      '.....oPPPPo.....',
-      '.....oPPPPo.....',
-      '.....oOOOOo.....',
-      '......oooo......'
-    ]
-  ]
-};
-BODIES.up = BODIES.down;
-
-const SPRITE_W = 16, SPRITE_H = 22;
-const OUTLINE_COLOR = '#2b2320';
-const PANTS_COLOR = '#3b5a8f';
-const SHOE_COLOR = '#5d4025';
-const EYE_COLOR = '#241f1c';
+const OUTLINE = '#3a2f28';
+const PANTS = '#3f5d92', PANTS_D = '#32496f';
+const SHOES = '#5a4030', SHOES_D = '#452f22';
 
 function shade(hex, f) {
   const n = parseInt(hex.slice(1), 16);
@@ -279,51 +23,298 @@ function shade(hex, f) {
   return `rgb(${r | 0},${g | 0},${b | 0})`;
 }
 
-function paintTemplate(ctx, rows, colors, ox, oy) {
-  for (let y = 0; y < rows.length; y++) {
-    const row = rows[y];
-    for (let x = 0; x < row.length; x++) {
-      const c = colors[row[x]];
-      if (!c) continue;
-      ctx.fillStyle = c;
-      ctx.fillRect(ox + x, oy + y, 1, 1);
-    }
-  }
+/* abgerundetes Rechteck */
+function _rr(ctx, x, y, w, h, r, fill, stroke) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
 }
 
-/* Alle Frames einer Figur (16x22): down/up/left/right x 0/1/2 */
-function makeCharacterSprites(cfg) {
-  const colors = {
-    o: OUTLINE_COLOR,
-    H: cfg.hair, h: shade(cfg.hair, 1.45),
-    S: cfg.skin, s: shade(cfg.skin, 0.82), A: cfg.skin,
-    E: EYE_COLOR, W: '#ffffff',
-    T: cfg.shirt, t: shade(cfg.shirt, 0.78),
-    P: PANTS_COLOR, p: shade(PANTS_COLOR, 0.78),
-    O: SHOE_COLOR
-  };
-  const head = HEADS[cfg.hairStyle] || HEADS.kurz;
-  const frames = {};
+function _blob(ctx, pts, fill, stroke) {
+  ctx.beginPath();
+  pts.forEach((p, i) => ctx[i ? 'lineTo' : 'moveTo'](p[0], p[1]));
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
+}
 
-  for (const dir of ['down', 'up', 'side']) {
-    for (let f = 0; f < 3; f++) {
-      const cv = document.createElement('canvas');
-      cv.width = SPRITE_W; cv.height = SPRITE_H;
-      const ctx = cv.getContext('2d');
-      paintTemplate(ctx, head[dir], colors, 0, 0);
-      paintTemplate(ctx, BODIES[dir][f], colors, 0, 12);
-      frames[(dir === 'side' ? 'right' : dir) + f] = cv;
+/* ---------- Frisuren ----------
+   Jede Frisur zeichnet die Haare um einen Kopf mit Mittelpunkt (0, cy)
+   und Radius r. dir: 'down' | 'up' | 'side' */
+const HAIR = {
+  kurz(ctx, cy, r, dir, col, colL) {
+    if (dir === 'up') {
+      // Von hinten sieht man nur den Hinterkopf – eine runde Haarkappe
+      ctx.beginPath();
+      ctx.ellipse(0, cy, r + 0.4, r * 1.06, 0, 0, Math.PI * 2);
+      ctx.fillStyle = col; ctx.fill();
+      ctx.strokeStyle = OUTLINE; ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(-r * 0.32, cy - r * 0.42, r * 0.3, r * 0.42, -0.35, 0, Math.PI * 2);
+      ctx.fillStyle = colL; ctx.fill();
+      return;
+    }
+    // Von vorn und von der Seite: Haaransatz über der Stirn
+    ctx.beginPath();
+    ctx.arc(0, cy, r + 0.4, Math.PI * 0.94, Math.PI * 2.06);
+    ctx.quadraticCurveTo(r * 0.75, cy + r * 0.34, r * 0.2, cy - r * 0.12);
+    ctx.quadraticCurveTo(-r * 0.4, cy + r * 0.22, -r * 0.78, cy - r * 0.3);
+    ctx.closePath();
+    ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.35, cy - r * 0.55, r * 0.32, r * 0.19, -0.5, 0, Math.PI * 2);
+    ctx.fillStyle = colL; ctx.fill();
+  },
+  lang(ctx, cy, r, dir, col, colL) {
+    // weiche Strähnen, die das Gesicht rahmen und bis auf die Schultern fallen
+    for (const sx of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(sx * r * 0.55, cy - r * 0.5);
+      ctx.quadraticCurveTo(sx * (r + 0.8), cy + r * 0.25, sx * (r + 0.55), cy + r * 1.35);
+      ctx.quadraticCurveTo(sx * (r + 0.02), cy + r * 1.58, sx * r * 0.44, cy + r * 1.18);
+      ctx.quadraticCurveTo(sx * r * 0.62, cy + r * 0.35, sx * r * 0.42, cy - r * 0.45);
+      ctx.closePath();
+      ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+    }
+    HAIR.kurz(ctx, cy, r, dir, col, colL);
+  },
+  wuschel(ctx, cy, r, dir, col, colL) {
+    for (const [dx, dy, rr] of [[-r * 0.8, -r * 0.55, r * 0.55], [-r * 0.25, -r * 0.85, r * 0.6],
+                                [r * 0.35, -r * 0.8, r * 0.58], [r * 0.85, -r * 0.45, r * 0.5]]) {
+      ctx.beginPath(); ctx.arc(dx, cy + dy, rr, 0, Math.PI * 2);
+      ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+    }
+    HAIR.kurz(ctx, cy, r, dir, col, colL);
+    for (const [dx, dy, rr] of [[-r * 0.8, -r * 0.55, r * 0.5], [-r * 0.25, -r * 0.85, r * 0.55],
+                                [r * 0.35, -r * 0.8, r * 0.53], [r * 0.85, -r * 0.45, r * 0.45]]) {
+      ctx.beginPath(); ctx.arc(dx, cy + dy, rr, 0, Math.PI * 2);
+      ctx.fillStyle = col; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(-r * 0.4, cy - r * 0.75, r * 0.22, 0, Math.PI * 2);
+    ctx.fillStyle = colL; ctx.fill();
+  },
+  pony(ctx, cy, r, dir, col, colL) {
+    HAIR.kurz(ctx, cy, r, dir, col, colL);
+    if (dir === 'up') return;
+    // Pony in weichen Spitzen – endet oberhalb der Augen
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.99, cy - r * 0.55);
+    ctx.lineTo(r * 0.99, cy - r * 0.55);
+    ctx.quadraticCurveTo(r * 0.82, cy - r * 0.02, r * 0.42, cy - r * 0.2);
+    ctx.quadraticCurveTo(r * 0.12, cy + r * 0.08, -r * 0.18, cy - r * 0.18);
+    ctx.quadraticCurveTo(-r * 0.55, cy + r * 0.02, -r * 0.99, cy - r * 0.55);
+    ctx.closePath();
+    ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+  },
+  zopf(ctx, cy, r, dir, col, colL) {
+    // zwei Zöpfe, die seitlich nach unten hängen
+    for (const sx of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(sx * r * 0.62, cy - r * 0.3);
+      ctx.quadraticCurveTo(sx * (r + 1.25), cy + r * 0.35, sx * (r + 0.95), cy + r * 1.25);
+      ctx.quadraticCurveTo(sx * (r + 0.35), cy + r * 1.45, sx * r * 0.62, cy + r * 1.05);
+      ctx.quadraticCurveTo(sx * r * 0.62, cy + r * 0.35, sx * r * 0.45, cy - r * 0.25);
+      ctx.closePath();
+      ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+      // Haargummi am Zopfende
+      ctx.beginPath();
+      ctx.ellipse(sx * (r + 0.78), cy + r * 1.12, r * 0.2, r * 0.14, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#e8577e'; ctx.fill();
+      ctx.strokeStyle = OUTLINE; ctx.stroke();
+    }
+    HAIR.kurz(ctx, cy, r, dir, col, colL);
+  },
+  locken(ctx, cy, r, dir, col, colL) {
+    for (let i = 0; i < 9; i++) {
+      const a = Math.PI * 0.98 + i * (Math.PI * 1.04) / 8;
+      ctx.beginPath();
+      ctx.arc(Math.cos(a) * r * 0.95, cy + Math.sin(a) * r * 0.95, r * 0.36, 0, Math.PI * 2);
+      ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+    }
+    HAIR.kurz(ctx, cy, r, dir, col, colL);
+    for (let i = 0; i < 9; i++) {
+      const a = Math.PI * 0.98 + i * (Math.PI * 1.04) / 8;
+      ctx.beginPath();
+      ctx.arc(Math.cos(a) * r * 0.95, cy + Math.sin(a) * r * 0.95, r * 0.3, 0, Math.PI * 2);
+      ctx.fillStyle = i % 3 ? col : colL; ctx.fill();
     }
   }
-  for (let f = 0; f < 3; f++) {
-    const src = frames['right' + f];
-    const cv = document.createElement('canvas');
-    cv.width = SPRITE_W; cv.height = SPRITE_H;
-    const ctx = cv.getContext('2d');
-    ctx.translate(SPRITE_W, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(src, 0, 0);
-    frames['left' + f] = cv;
+};
+
+/* ---------- Figur zeichnen ----------
+   dir: 'down' | 'up' | 'side' (Blick nach rechts)
+   pose: 0 = stehen, 1/2 = Schritt, 3 = Sprung, 4 = winken */
+function drawCharacter(ctx, cfg, dir, pose) {
+  const skin = cfg.skin, skinD = shade(cfg.skin, 0.86);
+  const hairC = cfg.hair, hairL = shade(cfg.hair, 1.42);
+  const shirt = cfg.shirt, shirtD = shade(cfg.shirt, 0.8), shirtL = shade(cfg.shirt, 1.12);
+  const hairFn = HAIR[cfg.hairStyle] || HAIR.kurz;
+
+  ctx.lineWidth = 1.05;
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = OUTLINE;
+
+  const jumping = pose === 3;
+  const bob = pose === 1 || pose === 2 ? 0.5 : 0;   // leichtes Wippen beim Gehen
+  const yOff = -bob;
+
+  ctx.save();
+  ctx.translate(0, yOff);
+
+  /* --- Beine --- */
+  const legY = -11.5, legH = 11.5;
+  let lx1 = -3.4, lx2 = 1.0, lh1 = legH, lh2 = legH;
+  if (pose === 1) { lx1 = -5.2; lx2 = 1.9; lh1 = legH - 1.2; lh2 = legH - 1.2; }
+  else if (pose === 2) { lx1 = -2.0; lx2 = 2.9; lh1 = legH - 1.2; lh2 = legH - 1.2; }
+  else if (jumping) { lx1 = -4.2; lx2 = 1.2; lh1 = legH - 3.6; lh2 = legH - 4.6; }
+
+  const drawLeg = (x, h, pantCol, shoeCol) => {
+    _rr(ctx, x, legY, 2.6, h - 1.6, 1.1, pantCol, OUTLINE);
+    _rr(ctx, x - 0.5, legY + h - 2.6, 3.6, 2.6, 1.1, shoeCol, OUTLINE);
+  };
+  if (dir === 'side') {
+    drawLeg(lx1 + 1.6, lh1, PANTS_D, SHOES_D);
+    drawLeg(lx2 - 1.0, lh2, PANTS, SHOES);
+  } else {
+    drawLeg(lx1, lh1, PANTS, SHOES);
+    drawLeg(lx2, lh2, PANTS_D, SHOES_D);
+  }
+
+  /* --- Körper --- */
+  const bodyTop = -20.5, bodyH = 9.6;
+  _rr(ctx, -5.2, bodyTop, 10.4, bodyH, 3.2, shirt, OUTLINE);
+  // Schattenseite und Lichtkante
+  ctx.save();
+  _rr(ctx, -5.2, bodyTop, 10.4, bodyH, 3.2, null, null);
+  ctx.clip();
+  ctx.fillStyle = shirtD;
+  ctx.fillRect(dir === 'side' ? -5.2 : 2.0, bodyTop, 3.2, bodyH);
+  ctx.fillStyle = shirtL;
+  ctx.fillRect(-5.2, bodyTop, 2.2, bodyH * 0.55);
+  ctx.restore();
+
+  /* --- Arme --- */
+  const armY = bodyTop + 1.4;
+  const drawArm = (x, swing, col) => {
+    ctx.save();
+    ctx.translate(x, armY);
+    ctx.rotate(swing);
+    _rr(ctx, -1.35, 0, 2.7, 7.4, 1.3, col, OUTLINE);
+    ctx.beginPath();
+    ctx.arc(0, 7.4, 1.55, 0, Math.PI * 2);
+    ctx.fillStyle = skin; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+    ctx.restore();
+  };
+  let swingA = 0, swingB = 0;
+  if (pose === 1) { swingA = 0.5; swingB = -0.5; }
+  else if (pose === 2) { swingA = -0.5; swingB = 0.5; }
+  else if (jumping) { swingA = 2.5; swingB = -2.5; }
+  else if (pose === 4) { swingA = 0.25; swingB = -2.75; }
+
+  if (dir === 'side') {
+    drawArm(2.4, swingB * 0.8, shirt);
+  } else {
+    drawArm(-5.4, swingA, shirtL === shirt ? shirt : shirt);
+    drawArm(5.4, swingB, shirtD);
+  }
+
+  /* --- Kopf --- */
+  const headR = 7.2, headY = -27.4;
+  // Hals
+  _rr(ctx, -1.7, headY + headR - 1.4, 3.4, 3.2, 1.2, skinD, OUTLINE);
+  // Gesichtsfläche
+  ctx.beginPath();
+  ctx.ellipse(0, headY, headR, headR * 1.04, 0, 0, Math.PI * 2);
+  ctx.fillStyle = skin; ctx.fill();
+  ctx.strokeStyle = OUTLINE; ctx.stroke();
+  // Schattenseite im Gesicht
+  ctx.save();
+  ctx.beginPath(); ctx.ellipse(0, headY, headR, headR * 1.04, 0, 0, Math.PI * 2); ctx.clip();
+  ctx.fillStyle = skinD;
+  ctx.fillRect(dir === 'side' ? -headR : headR * 0.42, headY - headR, headR * 0.6, headR * 2.2);
+  ctx.restore();
+
+  // Ohren
+  if (dir !== 'up') {
+    const ears = dir === 'side' ? [-headR * 0.25] : [-headR, headR];
+    for (const ex of ears) {
+      ctx.beginPath();
+      ctx.arc(ex, headY + 0.6, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = skin; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.stroke();
+    }
+  }
+
+  // Haare
+  hairFn(ctx, headY, headR, dir, hairC, hairL);
+
+  // Gesicht
+  if (dir === 'down') {
+    const eye = (x) => {
+      ctx.beginPath(); ctx.ellipse(x, headY + 1.1, 1.05, 1.35, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#2b2320'; ctx.fill();
+      ctx.beginPath(); ctx.arc(x - 0.35, headY + 0.6, 0.42, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff'; ctx.fill();
+    };
+    eye(-2.5); eye(2.5);
+    // Wangen
+    ctx.fillStyle = 'rgba(232,110,110,0.32)';
+    ctx.beginPath(); ctx.ellipse(-4.3, headY + 3.1, 1.5, 0.95, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(4.3, headY + 3.1, 1.5, 0.95, 0, 0, Math.PI * 2); ctx.fill();
+    // Mund
+    ctx.strokeStyle = '#8a4a3c'; ctx.lineWidth = 0.75;
+    ctx.beginPath();
+    ctx.arc(0, headY + 2.4, 1.75, jumping ? 0.15 : 0.35, Math.PI - (jumping ? 0.15 : 0.35));
+    ctx.stroke();
+    ctx.lineWidth = 1.05;
+  } else if (dir === 'side') {
+    ctx.beginPath(); ctx.ellipse(3.1, headY + 1.1, 1, 1.3, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#2b2320'; ctx.fill();
+    ctx.beginPath(); ctx.arc(2.8, headY + 0.6, 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    ctx.fillStyle = 'rgba(232,110,110,0.3)';
+    ctx.beginPath(); ctx.ellipse(5, headY + 3, 1.3, 0.85, 0, 0, Math.PI * 2); ctx.fill();
+    // Nase und Mund im Profil
+    ctx.strokeStyle = '#8a4a3c'; ctx.lineWidth = 0.75;
+    ctx.beginPath(); ctx.arc(4.6, headY + 2.6, 1.2, -0.3, 1.1); ctx.stroke();
+    ctx.lineWidth = 1.05;
+  }
+
+  ctx.restore();
+}
+
+/* ---------- Vorgezeichnete Einzelbilder ---------- */
+
+const CHAR_POSES = { stand: 0, walk1: 1, walk2: 2, jump: 3, wave: 4 };
+
+function renderCharFrame(cfg, dir, pose, flip) {
+  const cv = document.createElement('canvas');
+  cv.width = SPRITE_W; cv.height = SPRITE_H;
+  const ctx = cv.getContext('2d');
+  ctx.save();
+  ctx.translate(SPRITE_W / 2, SPRITE_H - CHAR_PX);
+  ctx.scale(CHAR_PX, CHAR_PX);
+  if (flip) ctx.scale(-1, 1);
+  drawCharacter(ctx, cfg, dir, pose);
+  ctx.restore();
+  return cv;
+}
+
+/* Alle Bilder einer Figur: down/up/left/right jeweils stand, 2 Schritte,
+   Sprung und Winken */
+function makeCharacterSprites(cfg) {
+  const frames = {};
+  const dirs = { down: ['down', false], up: ['up', false], right: ['side', false], left: ['side', true] };
+  for (const key in dirs) {
+    const [d, flip] = dirs[key];
+    for (const poseName in CHAR_POSES) {
+      frames[key + '_' + poseName] = renderCharFrame(cfg, d, CHAR_POSES[poseName], flip);
+    }
   }
   return frames;
 }
@@ -336,230 +327,4 @@ function randomCharConfig(rng) {
     hairStyle: pick(HAIR_STYLES).id,
     shirt: pick(SHIRT_COLORS)
   };
-}
-
-/* ================= Kachel-Grafiken ================= */
-
-function hash2(x, y) { return ((x * 73856093) ^ (y * 19349663)) >>> 0; }
-
-/* Meer mit Tiefenstufen, Wellen und Schaum an Küsten.
-   depth: 0 = flach (an Land), 1 = küstennah, 2 = tief
-   foam: {n,s,w,e} – Land in dieser Richtung */
-function drawSeaTile(ctx, px, py, tx, ty, phase, depth, foam) {
-  const base = depth === 0 ? '#54ace9' : depth === 1 ? '#4aa3e8' : '#4198e0';
-  ctx.fillStyle = base;
-  ctx.fillRect(px, py, TILE, TILE);
-
-  const h = hash2(tx, ty) % 97;
-  // weiche Übergänge zwischen den Tiefen: gestreute Pixel der Nachbartiefe
-  if (depth === 1) {
-    ctx.fillStyle = '#54ace9';
-    for (let i = 0; i < 3; i++) ctx.fillRect(px + ((h >> i) % 14), py + ((h >> (i + 3)) % 14), 2, 1);
-  } else if (depth === 2) {
-    ctx.fillStyle = '#3a8ed8';
-    for (let i = 0; i < 3; i++) ctx.fillRect(px + ((h >> i) % 14), py + ((h >> (i + 4)) % 14), 2, 2);
-  }
-  // sanfte Wellenlinien in zwei Phasen
-  if (h % 5 === phase * 2) {
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    const wy = py + 3 + (h % 9);
-    ctx.fillRect(px + (h % 6), wy, 6, 1);
-    ctx.fillRect(px + (h % 6) + 2, wy + 1, 3, 1);
-  }
-  if (h % 9 === (phase ? 4 : 0)) {
-    ctx.fillStyle = 'rgba(255,255,255,0.22)';
-    ctx.fillRect(px + 10 - (h % 5), py + 12 - (h % 7), 4, 1);
-  }
-  if (!foam) return;
-  // Schaum: unregelmäßige, weiche Tupfer entlang der Küste
-  const foamSide = (fx, fy, horiz, seed) => {
-    for (let i = 0; i < TILE; i++) {
-      const hh = hash2(tx * 16 + (horiz ? i : 0) + seed, ty * 16 + (horiz ? 0 : i) + phase * 7);
-      if (hh % 5 < 2) {
-        ctx.fillStyle = hh % 3 ? 'rgba(255,255,255,0.55)' : 'rgba(220,242,255,0.8)';
-        ctx.fillRect(horiz ? px + i : fx, horiz ? fy : py + i, 1, 1);
-        if (hh % 7 === 0) ctx.fillRect(horiz ? px + i : fx + (fx === px ? 1 : -1), horiz ? fy + (fy === py ? 1 : -1) : py + i, 1, 1);
-      }
-    }
-  };
-  if (foam.n) foamSide(px, py, true, 1);
-  if (foam.s) foamSide(px, py + TILE - 1, true, 2);
-  if (foam.w) foamSide(px, py, false, 3);
-  if (foam.e) foamSide(px + TILE - 1, py, false, 4);
-}
-
-function drawGrassTile(ctx, px, py, tx, ty, color, edges) {
-  ctx.fillStyle = color;
-  ctx.fillRect(px, py, TILE, TILE);
-  const h = hash2(tx, ty);
-  const dark = shade(color, 0.9), light = shade(color, 1.12);
-
-  // Struktur: kleine Grasbüschel und Farbflecken
-  ctx.fillStyle = dark;
-  for (let i = 0; i < 4; i++) {
-    const gx = (h >> (i * 3)) % 13, gy = (h >> (i * 3 + 5)) % 13;
-    ctx.fillRect(px + 1 + gx, py + 1 + gy, 2, 1);
-  }
-  ctx.fillStyle = light;
-  for (let i = 0; i < 3; i++) {
-    const gx = (h >> (i * 4 + 2)) % 12, gy = (h >> (i * 4 + 7)) % 12;
-    ctx.fillRect(px + 2 + gx, py + 2 + gy, 1, 2);
-  }
-  if (h % 7 === 0) { // Grasbüschel-„V“
-    const gx = px + 3 + (h % 9), gy = py + 4 + ((h >> 4) % 8);
-    ctx.fillStyle = dark;
-    ctx.fillRect(gx, gy, 1, 2);
-    ctx.fillRect(gx + 2, gy, 1, 2);
-    ctx.fillRect(gx + 1, gy + 1, 1, 1);
-  }
-
-  // Sandkante zur Küste: heller Sand + dunklere Abschlusslinie
-  const sand = '#f2dc96', sandDark = '#d9b96a';
-  const s = 2;
-  if (edges.n) { ctx.fillStyle = sand; ctx.fillRect(px, py, TILE, s); ctx.fillStyle = sandDark; ctx.fillRect(px, py, TILE, 1); }
-  if (edges.s) { ctx.fillStyle = sand; ctx.fillRect(px, py + TILE - s, TILE, s); ctx.fillStyle = sandDark; ctx.fillRect(px, py + TILE - 1, TILE, 1); }
-  if (edges.w) { ctx.fillStyle = sand; ctx.fillRect(px, py, s, TILE); ctx.fillStyle = sandDark; ctx.fillRect(px, py, 1, TILE); }
-  if (edges.e) { ctx.fillStyle = sand; ctx.fillRect(px + TILE - s, py, s, TILE); ctx.fillStyle = sandDark; ctx.fillRect(px + TILE - 1, py, 1, TILE); }
-}
-
-function drawBridgeTile(ctx, px, py, tx, ty, phase) {
-  drawSeaTile(ctx, px, py, tx, ty, phase, 1, null);
-  // Holzsteg mit Planken, Nägeln und Randbalken
-  ctx.fillStyle = '#dcae66';
-  ctx.fillRect(px, py + 1, TILE, TILE - 2);
-  ctx.fillStyle = '#c8964e';
-  for (let i = 4; i < TILE; i += 4) ctx.fillRect(px, py + i, TILE, 1);
-  ctx.fillStyle = '#a97a3c';
-  ctx.fillRect(px, py + 1, TILE, 1);
-  ctx.fillRect(px, py + TILE - 2, TILE, 1);
-  const h = hash2(tx, ty);
-  ctx.fillStyle = '#8a6230';
-  ctx.fillRect(px + 2 + (h % 4), py + 5, 1, 1);
-  ctx.fillRect(px + 10 + (h % 3), py + 10, 1, 1);
-}
-
-function drawTree(ctx, px, py, tx, ty) {
-  const h = hash2(tx, ty);
-  const g1 = h % 2 ? '#2e7d3b' : '#357a2e';   // Schattenlaub
-  const g2 = h % 2 ? '#43a047' : '#4c9a3d';   // Hauptlaub
-  const g3 = h % 2 ? '#66bb6a' : '#71b85e';   // Glanzlaub
-  // Stamm
-  ctx.fillStyle = '#5d4025';
-  ctx.fillRect(px + 7, py + 10, 3, 5);
-  ctx.fillStyle = '#7a5230';
-  ctx.fillRect(px + 8, py + 10, 1, 5);
-  // Laubkrone in drei Ebenen
-  ctx.fillStyle = g1;
-  ctx.beginPath(); ctx.arc(px + 8, py + 7, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = g2;
-  ctx.beginPath(); ctx.arc(px + 7, py + 6, 4.5, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(px + 10.5, py + 7.5, 3.5, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = g3;
-  ctx.beginPath(); ctx.arc(px + 6, py + 4.5, 2.2, 0, Math.PI * 2); ctx.fill();
-  ctx.fillRect(px + 9, py + 4, 2, 1);
-  // kleine Früchte/Blüten
-  if (h % 3 === 0) {
-    ctx.fillStyle = h % 6 ? '#e35b5b' : '#f4e04d';
-    ctx.fillRect(px + 4 + (h % 5), py + 6 + ((h >> 3) % 3), 1, 1);
-    ctx.fillRect(px + 9, py + 8, 1, 1);
-  }
-}
-
-function drawMountain(ctx, px, py, tx, ty) {
-  const h = hash2(tx, ty);
-  // Fels mit zwei Grautönen
-  ctx.fillStyle = '#7c7c8a';
-  ctx.beginPath();
-  ctx.moveTo(px + 8, py + 1);
-  ctx.lineTo(px + 15, py + 14);
-  ctx.lineTo(px + 1, py + 14);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#9a9aa8';
-  ctx.beginPath();
-  ctx.moveTo(px + 8, py + 1);
-  ctx.lineTo(px + 12, py + 14);
-  ctx.lineTo(px + 8, py + 14);
-  ctx.closePath(); ctx.fill();
-  // Schneekappe mit Zacken
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.moveTo(px + 8, py + 1);
-  ctx.lineTo(px + 10.5, py + 6);
-  ctx.lineTo(px + 9, py + 5);
-  ctx.lineTo(px + 8, py + 7);
-  ctx.lineTo(px + 7, py + 5);
-  ctx.lineTo(px + 5.5, py + 6);
-  ctx.closePath(); ctx.fill();
-  // Felsdetails
-  ctx.fillStyle = '#68687a';
-  ctx.fillRect(px + 5 + (h % 3), py + 9, 2, 1);
-  ctx.fillRect(px + 9, py + 11, 2, 1);
-}
-
-function drawFlowers(ctx, px, py, tx, ty) {
-  const h = hash2(tx, ty);
-  const cols = ['#ff8fb2', '#ffd447', '#ff7043', '#c58fff', '#ffffff'];
-  for (let i = 0; i < 3; i++) {
-    const fx = px + 2 + ((h >> (i * 4)) % 11);
-    const fy = py + 2 + ((h >> (i * 4 + 3)) % 10);
-    // Stängel
-    ctx.fillStyle = '#2e7d3b';
-    ctx.fillRect(fx + 1, fy + 2, 1, 2);
-    // Blüte mit hellem Zentrum
-    ctx.fillStyle = cols[(h + i) % cols.length];
-    ctx.fillRect(fx, fy, 3, 1);
-    ctx.fillRect(fx + 1, fy - 1, 1, 3);
-    ctx.fillStyle = '#fff6c9';
-    ctx.fillRect(fx + 1, fy, 1, 1);
-  }
-}
-
-function drawLandmarkBase(ctx, px, py) {
-  // Steinplatten-Plaza
-  ctx.fillStyle = '#e8e2d0';
-  ctx.fillRect(px, py + 4, TILE, TILE - 4);
-  ctx.fillStyle = '#d5cdb4';
-  ctx.fillRect(px, py + 9, TILE, 1);
-  ctx.fillRect(px + 5, py + 4, 1, 5);
-  ctx.fillRect(px + 10, py + 10, 1, 6);
-  ctx.fillStyle = '#c2b898';
-  ctx.fillRect(px, py + TILE - 2, TILE, 2);
-  ctx.fillStyle = '#f5f1e4';
-  ctx.fillRect(px + 1, py + 4, TILE - 2, 1);
-}
-
-/* Pinnwand: Holztafel auf zwei Pfosten mit bunten Zetteln.
-   Ragt oben 6px über die Kachel hinaus. */
-function drawPinboard(ctx, px, py) {
-  const top = py - 6;
-  // Pfosten
-  ctx.fillStyle = '#5d4025';
-  ctx.fillRect(px + 2, py + 6, 2, 9);
-  ctx.fillRect(px + 12, py + 6, 2, 9);
-  // Tafel mit Rahmen
-  ctx.fillStyle = '#8a6230';
-  ctx.fillRect(px, top, TILE, 12);
-  ctx.fillStyle = '#c8964e';
-  ctx.fillRect(px + 1, top + 1, TILE - 2, 10);
-  ctx.fillStyle = '#dcae66';
-  ctx.fillRect(px + 2, top + 2, TILE - 4, 8);
-  // Dach
-  ctx.fillStyle = '#a9442e';
-  ctx.fillRect(px - 1, top - 2, TILE + 2, 2);
-  ctx.fillStyle = '#c65b40';
-  ctx.fillRect(px - 1, top - 2, TILE + 2, 1);
-  // Zettel mit Pins
-  const papers = [
-    { x: 3, y: 3, w: 4, h: 5, c: '#fffdf5', p: '#e63946' },
-    { x: 8, y: 2, w: 5, h: 4, c: '#d9f0ff', p: '#2d6fc2' },
-    { x: 9, y: 7, w: 4, h: 3, c: '#fff3b0', p: '#35a251' }
-  ];
-  for (const pp of papers) {
-    ctx.fillStyle = pp.c;
-    ctx.fillRect(px + pp.x, top + pp.y, pp.w, pp.h);
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
-    for (let ly = 1; ly < pp.h - 1; ly += 2) ctx.fillRect(px + pp.x + 1, top + pp.y + ly, pp.w - 2, 1);
-    ctx.fillStyle = pp.p;
-    ctx.fillRect(px + pp.x + (pp.w >> 1), top + pp.y - 1, 1, 1);
-  }
 }

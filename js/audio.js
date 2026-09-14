@@ -3,7 +3,7 @@
    Spielt musik/hintergrund.mp3 als nahtlose Schleife in
    gedämpfter Lautstärke. Startet erst nach der ersten
    Nutzer-Interaktion (Browser-Autoplay-Regeln) und lässt sich
-   über den 🔊-Knopf an- und ausschalten.
+   über den Lautsprecher-Knopf an- und ausschalten.
    ============================================================ */
 
 const Music = {
@@ -74,8 +74,13 @@ const Music = {
     this.updateButton();
   },
 
+  isOn() { return this.enabled; },
+
   updateButton() {
     const btn = document.getElementById('btn-music');
-    if (btn) btn.textContent = this.enabled ? '🔊' : '🔇';
+    if (!btn || typeof iconEl !== 'function') return;
+    btn.innerHTML = '';
+    btn.appendChild(iconEl(this.enabled ? 'sound' : 'mute', 20));
+    btn.setAttribute('aria-label', this.enabled ? 'Musik ausschalten' : 'Musik einschalten');
   }
 };

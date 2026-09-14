@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>hey EU – Anmeldung</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇪🇺</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23003399'/><g fill='%23ffcc00'><circle cx='16' cy='7' r='1.9'/><circle cx='16' cy='25' r='1.9'/><circle cx='7' cy='16' r='1.9'/><circle cx='25' cy='16' r='1.9'/><circle cx='9.6' cy='9.6' r='1.9'/><circle cx='22.4' cy='22.4' r='1.9'/><circle cx='22.4' cy='9.6' r='1.9'/><circle cx='9.6' cy='22.4' r='1.9'/></g></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -141,6 +141,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       padding: .55rem .8rem;
     }
     .hint { margin-top: 1.1rem; font-size: .8rem; color: #7a93ad; }
+    .floaties svg {
+      width: 46px; height: 46px;
+      fill: none; stroke: #ffffff; stroke-width: 1.6;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .btn-inhalt { display: inline-flex; align-items: center; justify-content: center; gap: .5em; }
+    .btn-inhalt svg, .fehler svg { fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .fehler { display: flex; align-items: center; gap: .5em; }
 
     /* Partner-Logos unten links und rechts */
     .logo-ecke {
@@ -165,16 +174,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
   <div class="floaties" aria-hidden="true">
-    <span style="left:6%;  animation-duration:16s; animation-delay:0s">🗼</span>
-    <span style="left:22%; animation-duration:19s; animation-delay:2s">🏰</span>
-    <span style="left:38%; animation-duration:15s; animation-delay:4s">⛵</span>
-    <span style="left:54%; animation-duration:21s; animation-delay:1s">🌷</span>
-    <span style="left:70%; animation-duration:17s; animation-delay:5s">🐉</span>
-    <span style="left:86%; animation-duration:20s; animation-delay:3s">🎡</span>
+    <span style="left:6%;  animation-duration:16s; animation-delay:0s"><svg viewBox="0 0 24 24"><path d="M12 1.5 13.2 6h-2.4zM10.8 6h2.4l1.1 5h-4.6zM9.3 11h5.4l1.6 7.5h-8.6zM7.7 18.5h8.6L17 22H7zM9 13.5h6M8.3 16.5h7.4"/></svg></span>
+    <span style="left:22%; animation-duration:19s; animation-delay:2s"><svg viewBox="0 0 24 24"><path d="M3 22V9h3V6h2v3h3V6h2v3h3V6h2v3h3v13zM10 22v-6h4v6"/></svg></span>
+    <span style="left:38%; animation-duration:15s; animation-delay:4s"><svg viewBox="0 0 24 24"><path d="M12 2v14M12 15 4 16l8-13zM13.5 4.5 20 15l-6.5 1zM2 18h20l-2.5 4h-15z"/></svg></span>
+    <span style="left:54%; animation-duration:21s; animation-delay:1s"><svg viewBox="0 0 24 24"><path d="M12 12c-3 0-4.5-2.5-4.5-5.5C7.5 4 9 2.5 12 2.5s4.5 1.5 4.5 4c0 3-1.5 5.5-4.5 5.5zM12 3v9M12 12v10M12 16c-3.5 0-5-1.5-5-4M12 16c3.5 0 5-1.5 5-4"/></svg></span>
+    <span style="left:70%; animation-duration:17s; animation-delay:5s"><svg viewBox="0 0 24 24"><path d="M3 21h18M6 21V9l6-5 6 5v12M9.5 21v-5h5v5M8 12h2M14 12h2"/></svg></span>
+    <span style="left:86%; animation-duration:20s; animation-delay:3s"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="8"/><path d="M12 2v16M4 10h16M6.3 4.3l11.4 11.4M17.7 4.3 6.3 15.7M8 22h8l-4-8z"/></svg></span>
   </div>
 
   <div class="box">
-    <div class="logo"><span class="hey">hey</span><span class="eu">EU</span> 🇪🇺</div>
+    <div class="logo"><span class="hey">hey</span><span class="eu">EU</span></div>
     <p class="sub">Dein Europa-Abenteuer befindet sich in der <b>Test-Phase</b>.<br>
        Bitte melde dich mit deinen Zugangsdaten an.</p>
 
@@ -185,14 +194,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <label for="passwort">Passwort</label>
       <input id="passwort" name="passwort" type="password" required>
 
-      <button type="submit">🚀 Anmelden &amp; losspielen</button>
+      <button type="submit"><span class="btn-inhalt"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3c3.5 2.5 5 6 5 9.5L12 17l-5-4.5C7 9 8.5 5.5 12 3z"/><circle cx="12" cy="9.5" r="1.8"/><path d="M9.5 15.5 7 18m10-2.5L19.5 18M12 17v3.5"/></svg>Anmelden &amp; losspielen</span></button>
     </form>
 
     <?php if ($fehler): ?>
-      <div class="fehler">⚠️ <?= htmlspecialchars($fehler) ?></div>
+      <div class="fehler"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 4 2.5 20.5h19z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.6" r="1" fill="currentColor" stroke="none"/></svg><span><?= htmlspecialchars($fehler) ?></span></div>
     <?php endif; ?>
 
-    <p class="hint">Keine Zugangsdaten? Frag die Person, die dich zum Testen eingeladen hat. 😊</p>
+    <p class="hint">Keine Zugangsdaten? Frag die Person, die dich zum Testen eingeladen hat.</p>
   </div>
 
   <div class="logo-ecke links">

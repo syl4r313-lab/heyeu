@@ -1,6 +1,14 @@
 /* Generator: rasterisiert Länder-Polygone zu einer ASCII-Europakarte.
-   Ausgabe: js/mapdata.js mit EUROPE_MAP + MAP_CHARS. */
+   Ausgabe: js/mapdata.js mit EUROPE_MAP + MAP_CHARS.
+
+   Wichtig: Die Zwergstaaten (Andorra, Monaco, San Marino, Liechtenstein,
+   Vatikanstadt, Malta) sind auf der Karte bewusst viel größer gezeichnet
+   als in Wirklichkeit. Bei maßstabsgetreuer Darstellung wäre Andorra
+   genau eine Kachel groß – also so breit wie die Spielfigur selbst.
+   Aufruf:  node tools/mapgen.js
+*/
 const fs = require('fs');
+const path = require('path');
 
 const W = 92, H = 76;
 
@@ -14,41 +22,101 @@ function inside(px, py, poly) {
   return c;
 }
 
-/* Reihenfolge wichtig: spätere überschreiben frühere. '_' = neutrales Land */
-const REGIONS = [
-  // Neutrales Osteuropa (Belarus/Ukraine/Russland-Rand) bis zum Kartenrand
-  ['_', [[70,19],[86,17],[86,42],[78,44],[64,38],[63,31],[68,31],[71,27],[71,19]]],
-  // Neutraler Westbalkan (Bosnien, Serbien, Albanien, Bulgarien ...)
-  ['_', [[58,47],[64,45],[74,47],[76,52],[71,59],[64,58],[59,53]]],
+/* Zeichen -> Länder-ID */
+const MAP_CHARS = {
+  I: 'is', J: 'ie', U: 'uk', P: 'pt', E: 'es', a: 'ad', F: 'fr', o: 'mc',
+  B: 'be', u: 'lu', N: 'nl', D: 'de', K: 'dk', V: 'no', S: 'se', M: 'fi',
+  T: 'ee', L: 'lv', Y: 'lt', b: 'by', W: 'pl', C: 'cz', k: 'sk', A: 'at',
+  Z: 'ch', i: 'li', n: 'si', X: 'it', s: 'sm', v: 'va', t: 'mt', Q: 'hr',
+  h: 'ba', r: 'rs', m: 'me', x: 'xk', l: 'al', d: 'mk', G: 'bg', R: 'ro',
+  e: 'md', y: 'ua', H: 'hu', g: 'gr', c: 'cy'
+};
 
-  ['I', [[4,3],[13,2],[16,5],[12,8],[5,7]]],                                     // Island
-  ['J', [[15,17],[20,16],[21,20],[18,23],[14,21]]],                              // Irland
-  ['U', [[24,8],[28,7],[29,12],[32,17],[32,23],[27,26],[23,24],[25,18],[22,12]]],// Großbritannien
+/* Achteckiger Umriss um einen Mittelpunkt – für die Zwergstaaten,
+   damit sie nicht als Rechteck auf der Karte kleben. */
+function blob(cx, cy, rx, ry) {
+  const k = 0.42;
+  return [
+    [cx - rx * k, cy - ry], [cx + rx * k, cy - ry],
+    [cx + rx, cy - ry * k], [cx + rx, cy + ry * k],
+    [cx + rx * k, cy + ry], [cx - rx * k, cy + ry],
+    [cx - rx, cy + ry * k], [cx - rx, cy - ry * k]
+  ];
+}
+
+/* Reihenfolge wichtig: spätere Einträge überschreiben frühere.
+   Deshalb zuerst die großen Flächen, dann die kleineren Länder und
+   ganz zuletzt die Zwergstaaten. '_' = neutrales Land. */
+const REGIONS = [
+  // --- neutrale Randgebiete ---
+  ['_', [[77,14],[91,12],[91,46],[84,46],[80,36],[78,28],[76,20]]],          // Russland-Rand
+  ['_', [[72,59],[91,56],[91,64],[76,65],[70,63]]],                          // Türkei-Rand
+
+  // --- große Flächen zuerst ---
   ['V', [[40,13],[43,5],[49,1],[62,0],[70,1],[69,4],[56,5],[50,8],[47,13],[45,17],[41,17]]], // Norwegen
-  ['S', [[46,9],[52,6],[55,9],[54,15],[52,22],[48,22],[46,16]]],                 // Schweden
-  ['M', [[55,5],[66,2],[70,6],[68,12],[62,17],[58,14],[57,8]]],                  // Finnland
-  ['K', [[42,18],[45,18],[45,24],[41,24]]],                                      // Dänemark
-  ['T', [[63,20],[70,20],[70,23],[63,23]]],                                      // Estland
-  ['L', [[62,24],[71,24],[71,27],[62,27]]],                                      // Lettland
-  ['Y', [[61,28],[69,28],[68,31],[61,31]]],                                      // Litauen
-  ['W', [[52,26],[63,26],[64,31],[62,36],[53,37],[51,31]]],                      // Polen
-  ['N', [[39,25],[44,25],[44,30],[40,30]]],                                      // Niederlande
-  ['B', [[37,30],[42,30],[43,33],[38,33]]],                                      // Belgien
-  ['D', [[42,24],[51,24],[53,28],[53,36],[48,39],[43,38],[41,33],[42,29]]],      // Deutschland
-  ['C', [[46,37],[55,36],[57,40],[52,42],[46,41]]],                              // Tschechien
-  ['F', [[27,34],[36,30],[43,33],[44,40],[40,47],[31,48],[25,44],[24,37]]],      // Frankreich
-  ['Z', [[39,44],[44,43],[45,47],[39,47]]],                                      // Schweiz
-  ['A', [[45,43],[55,42],[57,45],[51,47],[45,46]]],                              // Österreich
-  ['H', [[56,42],[64,41],[65,45],[57,46]]],                                      // Ungarn
-  ['Q', [[55,46],[61,46],[64,50],[59,53],[55,49]]],                              // Kroatien
-  ['R', [[64,40],[75,39],[77,44],[72,48],[64,46]]],                              // Rumänien
-  ['E', [[14,49],[31,47],[34,49],[32,55],[26,62],[18,63],[16,55]]],              // Spanien
-  ['P', [[14,50],[17,49],[17,62],[13,62]]],                                      // Portugal
-  ['X', [[43,47],[52,46],[54,49],[52,52],[44,51]]],                               // Norditalien
-  ['X', [[49,50],[53,50],[55,55],[58,59],[61,60],[61,62],[56,64],[53,59],[50,55],[47,53]]], // Stiefel
-  ['X', [[47,53],[50,50],[52,52],[49,55]]],                                      // Übergang Po-Ebene/Stiefel
-  ['X', [[48,66],[54,66],[53,69],[47,68]]],                                      // Sizilien
-  ['G', [[64,57],[70,57],[72,60],[68,63],[70,68],[66,70],[63,68],[64,61]]] // Griechenland
+  ['S', [[46,9],[52,6],[55,9],[54,15],[52,22],[48,22],[46,16]]],             // Schweden
+  ['M', [[55,5],[66,2],[70,6],[68,12],[62,17],[58,14],[57,8]]],              // Finnland
+  ['y', [[64,30],[84,28],[87,34],[82,40],[70,41],[64,36]]],                  // Ukraine
+  ['b', [[64,24],[77,23],[78,30],[66,32],[63,29]]],                          // Belarus
+  ['F', [[26,33],[35,30],[42,34],[44,41],[40,48],[31,49],[24,45],[23,37]]],  // Frankreich
+  ['E', [[13,48],[31,46],[34,49],[32,56],[26,63],[17,64],[15,55]]],          // Spanien
+  ['D', [[41,24],[51,24],[53,28],[53,37],[48,40],[43,39],[41,34],[42,29]]],  // Deutschland
+  ['W', [[51,26],[64,26],[65,31],[63,37],[53,38],[50,31]]],                  // Polen
+  ['R', [[64,39],[78,38],[80,44],[74,49],[65,47]]],                          // Rumänien
+
+  // --- Inseln und Nordwesten ---
+  ['I', [[4,3],[13,2],[16,5],[12,8],[5,7]]],                                 // Island
+  ['J', [[14,16],[20,15],[21,20],[18,23],[13,21]]],                          // Irland
+  ['U', [[24,8],[28,7],[29,12],[32,17],[32,23],[27,26],[23,24],[25,18],[22,12]]], // Großbritannien
+  ['K', [[41,18],[46,18],[46,24],[41,24]]],                                  // Dänemark
+
+  // --- Baltikum nach Belarus und Polen, damit es sichtbar bleibt ---
+  ['T', [[62,19],[70,19],[70,23],[62,23]]],                                  // Estland
+  ['L', [[61,23],[72,23],[72,27],[61,27]]],                                  // Lettland
+  ['Y', [[62,27],[71,27],[71,31],[62,31]]],                                  // Litauen
+  ['e', [[76,35],[81,34],[81,40],[75,41]]],                                  // Moldau (nach Ukraine)
+
+  // --- Benelux nach Deutschland und Frankreich ---
+  ['N', [[37,24],[43,24],[44,29],[38,30]]],                                  // Niederlande
+  ['B', [[36,29],[43,29],[44,33],[37,34]]],                                  // Belgien
+
+  // --- Mitteleuropa ---
+  ['C', [[46,36],[56,35],[58,40],[52,42],[46,41]]],                          // Tschechien
+  ['k', [[56,36],[65,35],[66,40],[57,41]]],                                  // Slowakei
+  ['A', [[45,42],[57,41],[58,46],[51,48],[45,47]]],                          // Österreich
+  ['H', [[56,41],[66,40],[67,46],[57,47]]],                                  // Ungarn
+  ['Z', [[38,43],[45,42],[46,47],[39,48]]],                                  // Schweiz
+  ['P', [[12,49],[17,48],[17,63],[12,63]]],                                  // Portugal
+
+  // --- Italien ---
+  ['X', [[42,46],[52,45],[54,49],[52,53],[43,51]]],                          // Norditalien
+  ['X', [[48,50],[53,50],[55,55],[58,59],[60,60],[60,62],[55,64],[52,59],[49,55],[46,53]]], // Stiefel
+  ['X', [[46,53],[50,50],[52,52],[49,55]]],                                  // Übergang
+  ['X', [[47,66],[54,66],[53,69],[46,68]]],                                  // Sizilien
+  ['X', [[40,60],[44,59],[45,64],[41,65]]],                                  // Sardinien
+
+  // --- Südosten ---
+  ['G', [[70,48],[81,47],[82,54],[72,56]]],                                  // Bulgarien
+  ['r', [[63,44],[71,44],[72,51],[65,53]]],                                  // Serbien
+  ['Q', [[56,45],[63,44],[66,50],[60,54],[56,49]]],                          // Kroatien
+  ['n', [[50,45],[57,44],[58,48],[51,49]]],                                  // Slowenien
+  ['h', [[58,49],[64,48],[64,54],[59,56]]],                                  // Bosnien-Herzegowina
+  ['m', [[60,54],[65,53],[65,57],[60,57]]],                                  // Montenegro
+  ['x', [[65,50],[70,50],[70,54],[65,54]]],                                  // Kosovo
+  ['d', [[65,54],[71,53],[71,58],[66,59]]],                                  // Nordmazedonien
+  ['l', [[61,56],[65,55],[65,62],[61,62]]],                                  // Albanien
+  ['g', [[62,62],[71,60],[73,64],[68,66],[70,70],[65,72],[61,70],[62,65]]],  // Griechenland
+
+  // --- Zwergstaaten ganz zuletzt (bewusst übergroß, sonst unspielbar) ---
+  // blob() macht achteckige statt rechteckige Umrisse – sieht natürlicher aus
+  ['u', blob(43,   34.5, 2.3, 1.9)],                                         // Luxemburg
+  ['a', blob(27,   46.5, 2.3, 1.9)],                                         // Andorra
+  ['o', blob(44.5, 48.5, 2.1, 1.9)],                                         // Monaco
+  ['i', blob(45.5, 42.5, 2.1, 1.9)],                                         // Liechtenstein
+  ['s', blob(52.5, 53.5, 2.1, 1.9)],                                         // San Marino
+  ['v', blob(51.5, 57.5, 2.1, 1.9)],                                         // Vatikanstadt
+  ['t', blob(51,   72.5, 2.3, 1.9)],                                         // Malta
+  ['c', blob(83,   67.5, 3.2, 1.9)]                                          // Zypern
 ];
 
 const grid = Array.from({ length: H }, () => Array(W).fill('.'));
@@ -60,13 +128,11 @@ for (const [ch, poly] of REGIONS) {
   }
 }
 
-// Sizilien mit Stiefelspitze verbinden (Straße von Messina, künstlerische Freiheit)
-// wird nach Sichtprüfung ggf. angepasst – Verbindungszellen:
-for (const [x, y] of [[54,64],[54,65],[53,65]]) grid[y][x] = 'X';
+/* Sizilien mit der Stiefelspitze verbinden (Straße von Messina) */
+for (const [x, y] of [[53,64],[53,65],[52,65]]) grid[y][x] = 'X';
 
-
-// Eingeschlossene Meere füllen: alles Meer, das den Kartenrand nicht erreicht,
-// wird neutrales Land (verhindert Pfützen-Löcher an Polygon-Nahtstellen)
+/* Eingeschlossene Meere füllen: Meer, das den Kartenrand nicht erreicht,
+   wird neutrales Land – verhindert Löcher an den Polygon-Nahtstellen. */
 {
   const reach = Array.from({ length: H }, () => Array(W).fill(false));
   const stack = [];
@@ -84,27 +150,47 @@ for (const [x, y] of [[54,64],[54,65],[53,65]]) grid[y][x] = 'X';
       if (grid[y][x] === '.' && !reach[y][x]) grid[y][x] = '_';
 }
 
+/* Kontrolle: wie viele Zellen hat jedes Land bekommen? */
+const counts = {};
+for (const row of grid) for (const ch of row) counts[ch] = (counts[ch] || 0) + 1;
+const fehlend = [];
+for (const ch in MAP_CHARS) {
+  const n = counts[ch] || 0;
+  if (n < 4) fehlend.push(`${MAP_CHARS[ch]} (${ch}): nur ${n} Zellen`);
+}
+if (fehlend.length) {
+  console.error('ACHTUNG – zu kleine oder fehlende Länder:');
+  fehlend.forEach(f => console.error('   ' + f));
+} else {
+  console.log('Alle', Object.keys(MAP_CHARS).length, 'Länder haben genug Platz.');
+}
+
 const rows = grid.map(r => r.join(''));
+const charLines = Object.entries(MAP_CHARS)
+  .map(([ch, id]) => `${ch}: '${id}'`);
+const chunked = [];
+for (let i = 0; i < charLines.length; i += 8) chunked.push('  ' + charLines.slice(i, i + 8).join(', '));
+
 const out = `/* ============================================================
-   hey EU – Europakarte (generiert aus Polygonen)
-   Ein Zeichen = eine Kachel (vor Skalierung).
+   hey EU – Europakarte (erzeugt aus Polygonen, tools/mapgen.js)
+   Ein Zeichen = eine Kachel vor der Skalierung.
    '.' = Meer, '_' = neutrales Land (kein Spiel-Land)
+   Nicht von Hand ändern – stattdessen tools/mapgen.js anpassen
+   und "node tools/mapgen.js" ausführen.
    ============================================================ */
 
 const MAP_CHARS = {
-  I: 'is', J: 'ie', U: 'uk', P: 'pt', E: 'es', F: 'fr', B: 'be', N: 'nl',
-  D: 'de', K: 'dk', V: 'no', S: 'se', M: 'fi', T: 'ee', L: 'lv', Y: 'lt',
-  W: 'pl', C: 'cz', A: 'at', Z: 'ch', X: 'it', H: 'hu', Q: 'hr', R: 'ro', G: 'gr'
+${chunked.join(',\n')}
 };
 
 const EUROPE_MAP = [
 ${rows.map(r => `  '${r}'`).join(',\n')}
 ];
-`;
-fs.writeFileSync('/home/user/heyeu/js/mapdata.js', out);
-console.log('mapdata.js geschrieben:', W + 'x' + H);
 
-// Weltgröße anhängen
-fs.appendFileSync('/home/user/heyeu/js/mapdata.js',
-  `\nconst WORLD_W = ${W} * MAP_SCALE;\nconst WORLD_H = ${H} * MAP_SCALE;\n`);
-console.log('Weltgröße:', W * 2, 'x', H * 2);
+const WORLD_W = ${W} * MAP_SCALE;
+const WORLD_H = ${H} * MAP_SCALE;
+`;
+
+const target = path.join(__dirname, '..', 'js', 'mapdata.js');
+fs.writeFileSync(target, out);
+console.log('js/mapdata.js geschrieben:', W + 'x' + H, 'Zeichen =', W * 2 + 'x' + H * 2, 'Kacheln');

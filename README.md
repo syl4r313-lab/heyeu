@@ -1,97 +1,130 @@
-# hey EU 🇪🇺 – Dein Europa-Abenteuer
+# hey EU – Dein Europa-Abenteuer
 
-Eine kinderfreundliche Web-App im Stil klassischer RPGs (inspiriert von den alten
-Final-Fantasy-Weltkarten): Schülerinnen und Schüler reisen über eine bunte
-Pixel-Europakarte, begegnen Kindern aus anderen Ländern, chatten mit ihnen
-(jeder Chat beginnt mit **„hey EU“**), entdecken Wahrzeichen und lösen Aufgaben
-von Moderator:innen.
+Eine kinderfreundliche Web-App: Schülerinnen und Schüler laufen über eine
+zusammenhängende Europakarte, begegnen Kindern aus anderen Ländern, chatten
+mit ihnen (jeder Chat beginnt mit **„hey EU“**), entdecken Wahrzeichen und
+lösen Aufgaben von Moderator:innen.
 
 ![Genre](https://img.shields.io/badge/Genre-Lern--RPG-blue)
 ![Plattform](https://img.shields.io/badge/Plattform-Browser%20%2B%20Handy-green)
 
-## ✨ Funktionen
+## Funktionen
 
-- 🗺️ **Europakarte im Retro-RPG-Stil** – 25 Länder als kleine, begehbare
-  Inseln (Umriss + Wahrzeichen), verbunden durch breite Holzstege über
-  das Meer, mit Küstenschaum, Wassertiefen und detailreichen Kacheln
-- 🚶 **Bewegung wie in alten Final-Fantasy-Teilen** – Kachel für Kachel,
-  mit Laufanimation und Kamera, die dem Spieler folgt
-- 🎨 **Charakter-Editor** – Name, Heimatland, Hautfarbe, Frisur, Haarfarbe
-  und Lieblingsfarbe; fein gezeichnete Pixel-Figuren mit Umriss,
-  Schattierung und Laufanimation in vier Richtungen
-- 💬 **Chatten mit Schimpfwortfilter** – Kinder aus jedem Land ansprechen
-  und in der Chatbox schreiben; jeder Chat beginnt automatisch mit
-  „hey EU!“; ein Wortfilter blockiert beleidigende Nachrichten
-- 🔤 **Namensfilter** – unangemessene Spielernamen (Schimpfwörter,
-  NS-Bezüge, getarnte Schreibweisen wie „H1tler“) werden abgelehnt
-- ⭐ **Moderator:innen** (goldene Shirts) stellen Aufgaben:
-  Quizfragen über Europa und Reise-Aufgaben („Besuche das Kolosseum!“)
-- 📌 **Pinnwände in jedem Land** – mit besonderen Mitmach-Aufgaben von
-  Moderator:innen (z. B. „Mach ein Foto aus deinem Klassenraum“).
-  Kinder reichen Text und/oder Foto ein; Administrator:innen prüfen die
-  Beiträge im Admin-Bereich und schalten sie frei (dann erscheinen sie
-  in der Pinnwand-Galerie und es gibt Sterne)
-- 🛡️ **Admin-Bereich** – über „?“ → „Admin-Bereich“, Demo-PIN: `2468`
-  (in `js/data.js` änderbar)
-- 🗼 **Wahrzeichen & Länderwissen** – jedes Land hat sein typisches
-  Wahrzeichen (Eiffelturm, Wawel-Drache, Kleine Meerjungfrau …) mit
-  kindgerechter Erklärung
-- 📱 **Mobil spielbar** – Touch-Steuerkreuz, A-Knopf, responsives Layout
-- 💾 **Automatisches Speichern** im Browser (localStorage)
+- **Europakarte mit offenen Grenzen** – 45 Länder: alle 27 EU-Mitglieder,
+  die Zwergstaaten und die übrigen Länder des Kontinents. Die Länder gehen
+  nahtlos ineinander über; Holzstege und Fähren führen nur dorthin, wo es
+  sie ungefähr auch wirklich gibt (Eurotunnel, Öresundbrücke, Helsinki–Tallinn …).
+- **Alles von Hand gezeichnet** – keine Emojis. Flaggen (`js/flags.js`),
+  Wahrzeichen (`js/landmarks.js`), Bediensymbole (`js/icons.js`), Gelände
+  (`js/terrain.js`) und Figuren (`js/sprites.js`) werden als Vektorgrafik
+  auf Canvas gezeichnet und sehen in jeder Größe sauber aus.
+- **Laufen und Hüpfen** – Kachel für Kachel mit Laufanimation; Hüpfen per
+  Taste `J` oder Sprung-Knopf, auch mitten im Laufen. Die anderen Kinder
+  hüpfen ab und zu von selbst und winken bei der Begrüßung.
+- **Charakter-Editor** – Name, Heimatland (frei eintippbar), Hautfarbe,
+  sechs Frisuren, Haarfarbe und Lieblingsfarbe. Die Vorschau hüpft auf
+  Antippen.
+- **Heimatland frei wählbar** – Kinder tippen ihr Land selbst ein. Liegt es
+  auf der Karte, startet man dort; liegt es außerhalb Europas, startet man
+  in Brüssel. Erkannt werden deutsche, englische und landessprachliche
+  Schreibweisen.
+- **Chatten mit Wortfilter** – Kinder ansprechen und frei schreiben; ein
+  Filter blockiert beleidigende Nachrichten und unangemessene Spielernamen,
+  auch getarnte Schreibweisen wie „H1tler“.
+- **Moderator:innen** (goldene Shirts) stellen Quizfragen über Europa und
+  Reise-Aufgaben („Besuche das Kolosseum!“).
+- **Pinnwände in jedem Land** – mit Mitmach-Aufgaben. Kinder reichen Text
+  und/oder Foto ein, Administrator:innen prüfen und schalten frei.
+- **Admin-Bereich** – über „?“ → „Admin-Bereich“, Demo-PIN `2468`
+  (in `js/data.js`). **Achtung:** Die PIN steht im Quelltext und ist damit
+  für alle sichtbar. Echter Schutz kommt erst mit einem Server.
+- **Mobil spielbar** – Touch-Steuerkreuz, Aktions- und Sprung-Knopf,
+  Layout passt sich an.
+- **Automatisches Speichern** im Browser (localStorage).
 
-## 🚀 Starten
+## Starten
 
-Es gibt nichts zu installieren – die App ist reines HTML/CSS/JavaScript.
+Es gibt nichts zu installieren – die App ist reines HTML, CSS und JavaScript.
 
-**Option 1:** `index.html` einfach im Browser öffnen (Doppelklick).
+**Option 1:** `index.html` im Browser öffnen (Doppelklick). Die
+Hintergrundmusik bleibt dabei stumm, weil Browser lokale Dateien nicht
+nachladen dürfen.
 
-**Option 2 (empfohlen, z. B. fürs Handy im gleichen WLAN):**
+**Option 2 (empfohlen):**
 
 ```bash
-# im Projektordner:
 python3 -m http.server 8000
-# dann im Browser: http://localhost:8000
-# am Handy: http://<IP-des-Computers>:8000
+# Browser: http://localhost:8000
+# Handy im gleichen WLAN: http://<IP-des-Computers>:8000
 ```
 
-## 🎮 Steuerung
+## Steuerung
 
 | Aktion | Computer | Handy |
 |---|---|---|
-| Laufen | Pfeiltasten / WASD | Steuerkreuz (links unten) |
-| Sprechen / Ansehen | Leertaste oder Enter | A-Knopf (rechts unten) |
-| Aufgaben / Karte / Hilfe | Knöpfe oben rechts | Knöpfe oben rechts |
+| Laufen | Pfeiltasten oder WASD | Steuerkreuz links unten |
+| Sprechen / Ansehen | Leertaste oder Enter | runder Knopf rechts unten |
+| Hüpfen | `J` (oder Leertaste, wenn nichts in der Nähe ist) | gelber Knopf rechts unten |
+| Aufgaben, Karte, Hilfe | Knöpfe oben rechts | Knöpfe oben rechts |
 
-## 🧑‍🏫 Für Lehrkräfte & Moderator:innen
+## Für Lehrkräfte und Moderator:innen
 
-Die Aufgaben (Quizfragen, Reiseziele) und alle Ländertexte liegen gut
-lesbar in `js/data.js` und lassen sich dort ohne Programmierkenntnisse
-anpassen oder erweitern – einfach Texte ändern und Seite neu laden.
+Alle Ländertexte, Quizfragen und Pinnwand-Aufgaben stehen gut lesbar in
+`js/data.js` und lassen sich dort ohne Programmierkenntnisse ändern –
+Text anpassen, Seite neu laden, fertig. Der Wortfilter in `js/filter.js`
+ist ebenso bewusst einfach gehalten und erweiterbar.
 
-## 🔧 Technischer Hinweis: Mehrspieler-Modus & Moderation
+## Karte ändern
 
-Diese Version läuft komplett im Browser – die anderen Kinder und
-Moderator:innen werden von der App simuliert, damit sie ohne Server
-funktioniert (ideal zum Ausprobieren im Unterricht). Auch die
-Pinnwand-Beiträge und der Admin-Bereich laufen lokal im Browser: Die
-Freigabe demonstriert den Moderations-Ablauf, ersetzt aber keinen echten
-Server. Für **echte** Begegnungen zwischen Schüler:innen verschiedener
-Schulen (und echte Beitragsprüfung durch Administrator:innen) braucht es
-einen kleinen Server (z. B. WebSocket + Datenbank), der Positionen,
-Chat-Nachrichten und Einreichungen austauscht. Die Spielstruktur
-(Spieler-Objekte, Chat-System, Aufgaben- und Einreichungsverwaltung) ist
-so gebaut, dass sich das ergänzen lässt. Der Wortfilter in `js/filter.js`
-ist bewusst gut lesbar und von Lehrkräften erweiterbar.
+Die Europakarte wird aus Länder-Polygonen erzeugt:
 
-## 📁 Projektstruktur
+```bash
+node tools/mapgen.js     # schreibt js/mapdata.js neu
+```
+
+`js/mapdata.js` **nicht von Hand ändern** – stattdessen die Polygone in
+`tools/mapgen.js` anpassen. Das Skript warnt, wenn ein Land von einem
+anderen überdeckt wurde oder zu klein geraten ist.
+
+Hinweis zum Maßstab: Eine Kartenkachel entspricht etwa 24 Kilometern.
+Andorra wäre damit genau eine Kachel groß – so breit wie die Spielfigur
+selbst. Die Zwergstaaten (Andorra, Monaco, San Marino, Liechtenstein,
+Vatikanstadt, Malta) sind deshalb bewusst viel größer gezeichnet, damit
+man sie besuchen kann. Der echte Größenunterschied steht jeweils im
+Info-Fenster des Wahrzeichens.
+
+## Mehrspieler-Modus und Moderation
+
+Diese Version läuft komplett im Browser: Die anderen Kinder und die
+Moderator:innen werden von der App simuliert, Pinnwand-Beiträge und
+Admin-Freigaben liegen nur lokal auf dem jeweiligen Gerät. Zwei Kinder,
+die gleichzeitig spielen, sehen einander also **nicht**.
+
+Für echte Begegnungen zwischen Schulen braucht es einen kleinen Server
+(Node.js mit WebSocket und Datenbank), der Positionen, Chat-Nachrichten
+und Einreichungen austauscht – und der den Wortfilter serverseitig
+ausführt, weil ein Filter im Browser umgangen werden kann. Die
+Spielstruktur ist so gebaut, dass sich das ergänzen lässt.
+
+## Projektstruktur
 
 ```
-index.html        – App-Gerüst (Titel, Editor, Spiel, Panels)
-css/style.css     – Design (bunt, rund, mobil-optimiert)
-js/data.js        – Länder, Wahrzeichen, Quiz, Pinnwand-Aufgaben, Admin-PIN
-js/filter.js      – Schimpfwort- und Namensfilter (leicht erweiterbar)
-js/sprites.js     – Pixel-Figuren & Kachelgrafiken
-js/world.js       – Weltkarte bauen & vorrendern
-js/game.js        – Spiel-Engine (Bewegung, NPCs, Chat, Aufgaben, Pinnwand, Admin)
-js/ui.js          – Titelbildschirm & Charakter-Editor
+index.html          App-Gerüst (Titel, Editor, Spiel, Fenster)
+css/style.css       Gestaltung
+js/data.js          Länder, Wahrzeichen, Quiz, Pinnwand-Aufgaben, Admin-PIN,
+                    Länder-Erkennung und deutsche Beugung der Ländernamen
+js/mapdata.js       erzeugte Europakarte (nicht von Hand ändern)
+js/icons.js         Bediensymbole als SVG
+js/flags.js         Flaggen aller Länder, auf Canvas gezeichnet
+js/landmarks.js     44 gezeichnete Wahrzeichen
+js/terrain.js       Gras, Küste, Bäume, Berge, Wege, Häuser, Meer
+js/sprites.js       Figuren, Frisuren, Lauf- und Sprungposen
+js/world.js         Welt aufbauen, Kartenstücke zeichnen, Übersichtskarte
+js/game.js          Spiel-Engine (Bewegung, Hüpfen, NPCs, Chat, Aufgaben,
+                    Pinnwand, Admin, Darstellung)
+js/ui.js            Titelbildschirm und Charakter-Editor
+js/filter.js        Wort- und Namensfilter
+js/audio.js         Hintergrundmusik
+tools/mapgen.js     erzeugt js/mapdata.js aus Länder-Polygonen
+deploy-ionos/       Paket für den Upload auf heyeu.de (Login + Spiel)
 ```

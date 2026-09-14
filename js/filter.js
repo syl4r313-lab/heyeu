@@ -67,10 +67,10 @@ function isTextClean(text) {
 function checkName(name) {
   const trimmed = name.trim();
   if (trimmed.length < 2) return 'Dein Name braucht mindestens 2 Buchstaben.';
-  if (!isTextClean(trimmed)) return 'Diesen Namen kannst du leider nicht wählen. Such dir bitte einen anderen aus. 😊';
+  if (!isTextClean(trimmed)) return 'Diesen Namen kannst du leider nicht wählen. Such dir bitte einen anderen aus.';
   const squeezed = normalizeText(trimmed).replace(/[^a-z]/g, '');
   for (const bad of BAD_NAMES) {
-    if (squeezed.includes(bad)) return 'Diesen Namen kannst du leider nicht wählen. Such dir bitte einen anderen aus. 😊';
+    if (squeezed.includes(bad)) return 'Diesen Namen kannst du leider nicht wählen. Such dir bitte einen anderen aus.';
   }
   return null;
 }
